@@ -39,13 +39,6 @@
                     </plugin>
                 </plugins>
             </build>
-            <distributionManagement>
-                <repository>
-                    <id>bintray-nickrobison-maven</id>
-                    <name>nickrobison-maven</name>
-                    <url>https://api.bintray.com/maven/nickrobison/maven/fasttuple/</url>
-                </repository>
-            </distributionManagement>
         </profile>
     </profiles>
 
@@ -120,5 +113,18 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>bintray-nickrobison-maven</id>
+            <name>JFrog OSS Repository</name>
+            <url></url>
+        </snapshotRepository>
+        <repository>
+            <id>bintray-nickrobison-maven</id>
+            <name>Bintray Maven Repository</name>
+            <url>https://api.bintray.com/maven/nickrobison/maven/fasttuple/</url>
+        </repository>
+    </distributionManagement>
 
 </project>
