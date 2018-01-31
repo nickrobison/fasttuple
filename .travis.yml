@@ -1,9 +1,20 @@
 language: java
-jdk:
-- oraclejdk8
+
 sudo: false
 install: true
+
+matrix:
+  include:
+    - jdk: oraclejdk9
+      env: TARGET='-Pjava9'
+    - jdk: oracle8
+      env: TARGET='-Pjava8'
+
 addons:
+  apt:
+    packages:
+       - oracle-java8-installer
+       - oracle-java9-installer
   sonarcloud:
     organization: nickrobison-github
     token:
@@ -12,7 +23,9 @@ addons:
       - master
       - development
 script:
-- mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
+  - mvn clean test -P ${TARGET}
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
+
 cache:
   directories:
   - "$HOME/.m2/repository"
