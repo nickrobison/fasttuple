@@ -10,6 +10,7 @@ import static org.junit.Assert.*;
 /**
  * Created by cliff on 5/9/14.
  */
+@SuppressWarnings("unchecked")
 public class HeapTupleCodeGeneratorTest {
     @Test
     public void testAccessorsGetGenerated() throws Exception {

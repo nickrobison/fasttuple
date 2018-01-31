@@ -2,9 +2,8 @@ package com.nickrobison.tuple;
 
 import org.junit.Test;
 
-import java.lang.reflect.Type;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by cliff on 5/4/14.

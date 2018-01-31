@@ -31,6 +31,7 @@ public class TupleAllocatorGenerator extends ClassBodyEvaluator {
         allocatorClass = compileToClass(cu);
     }
 
+    @SuppressWarnings("unchecked")
     public TupleAllocator createAllocator() throws Exception {
         return (TupleAllocator)allocatorClass.getConstructor().newInstance();
     }

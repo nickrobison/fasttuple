@@ -39,7 +39,7 @@ public class TuplePoolTest {
 
         for (int i=0; i<10; i++) {
             Long n = pool.checkout();
-            assertEquals(new Long(0L), n);
+            assertEquals(Long.valueOf(0L), n);
         }
         exception.expect(IllegalStateException.class);
         pool.checkout();
@@ -67,7 +67,7 @@ public class TuplePoolTest {
         );
         for (int i=0; i<11; i++) {
             Long n = pool.checkout();
-            assertEquals(new Long(0L), n);
+            assertEquals(Long.valueOf(0L), n);
         }
         assertEquals(20, pool.getSize());
     }
