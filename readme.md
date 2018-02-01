@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/nickrobison/fasttuple.svg?branch=master)](https://travis-ci.org/nickrobison/fasttuple)
+[![Travis Build Status](https://travis-ci.org/nickrobison/fasttuple.svg?branch=master)](https://travis-ci.org/nickrobison/fasttuple)
+[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/uf020ymm5lunigxu/branch/master?svg=true)](https://ci.appveyor.com/project/nickrobison/fasttuple)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.nickrobison/fasttuple-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.nickrobison/fasttuple-core)
 [![JavaDoc](http://www.javadoc.io/badge/com.nickrobison/fasttuple-core.svg)](http://www.javadoc.io/doc/com.nickrobison/fasttuple-core)
 [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)

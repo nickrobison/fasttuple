@@ -22,7 +22,51 @@
         <code.level>1.8</code.level>
     </properties>
 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.7.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-javadoc-plugin</artifactId>-->
+            <!--<version>3.0.0</version>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<id>attach-javadoc</id>-->
+            <!--<phase>package</phase>-->
+            <!--<goals>-->
+            <!--<goal>jar</goal>-->
+            <!--</goals>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--</plugin>-->
+        </plugins>
+    </build>
+
     <profiles>
+        <!--Release profile builds the Java 9 modules, with Java 8 bytecode-->
+        <!--Requires installed JDK 9-->
         <profile>
             <id>release</id>
             <build>
@@ -41,9 +85,40 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-compile</id>
+                                <configuration>
+                                    <!-- compile everything to ensure module-info contains right entries -->
+                                    <release>9</release>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>base-compile</id>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <!-- recompile everything for target VM except the module-info.java -->
+                                <configuration>
+                                    <excludes>
+                                        <exclude>module-info.java</exclude>
+                                    </excludes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <!-- defaults for compile and testCompile -->
+                        <configuration>
+                            <source>${code.level}</source>
+                            <target>${code.level}</target>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
+        <!--Builds strictly for Java 9-->
         <profile>
             <id>java9</id>
             <properties>
@@ -54,29 +129,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.7.0</version>
-                        <!--<executions>-->
-                            <!--<execution>-->
-                                <!--<id>default-compile</id>-->
-                                <!--<configuration>-->
-                                    <!--&lt;!&ndash; compile everything to ensure module-info contains right entries &ndash;&gt;-->
-                                    <!--<release>9</release>-->
-                                <!--</configuration>-->
-                            <!--</execution>-->
-                            <!--<execution>-->
-                                <!--<id>base-compile</id>-->
-                                <!--<goals>-->
-                                    <!--<goal>compile</goal>-->
-                                <!--</goals>-->
-                                <!--&lt;!&ndash; recompile everything for target VM except the module-info.java &ndash;&gt;-->
-                                <!--<configuration>-->
-                                    <!--<excludes>-->
-                                        <!--<exclude>module-info.java</exclude>-->
-                                    <!--</excludes>-->
-                                <!--</configuration>-->
-                            <!--</execution>-->
-                        <!--</executions>-->
-                        <!-- defaults for compile and testCompile -->
                         <configuration>
                             <source>${code.level}</source>
                             <target>${code.level}</target>
@@ -85,6 +137,7 @@
                 </plugins>
             </build>
         </profile>
+        <!--Builds for Java 8, ignoring module files-->
         <profile>
             <id>java8</id>
             <activation>
@@ -95,8 +148,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.7.0</version>
-                        <!-- defaults for compile and testCompile -->
                         <configuration>
                             <excludes>
                                 <exclude>module-info.java</exclude>
@@ -109,40 +160,6 @@
             </build>
         </profile>
     </profiles>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!--<plugin>-->
-            <!--<groupId>org.apache.maven.plugins</groupId>-->
-            <!--<artifactId>maven-javadoc-plugin</artifactId>-->
-            <!--<version>3.0.0</version>-->
-            <!--<executions>-->
-            <!--<execution>-->
-            <!--<id>attach-javadoc</id>-->
-            <!--<phase>package</phase>-->
-            <!--<goals>-->
-            <!--<goal>jar</goal>-->
-            <!--</goals>-->
-            <!--</execution>-->
-            <!--</executions>-->
-            <!--</plugin>-->
-        </plugins>
-    </build>
 
     <scm>
         <connection>scm:git:git@github.com:nickrobison/fasttuple.git</connection>

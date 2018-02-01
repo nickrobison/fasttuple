@@ -11,10 +11,10 @@ matrix:
       env: TARGET='-Pjava8'
 
 addons:
-#  apt:
-#    packages:
-#       - oracle-java8-installer
-#       - oracle-java9-installer
+  apt:
+    packages:
+       - oracle-java8-installer
+       - oracle-java9-installer
   sonarcloud:
     organization: nickrobison-github
     token:
