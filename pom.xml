@@ -118,7 +118,7 @@
         <snapshotRepository>
             <id>bintray-nickrobison-maven</id>
             <name>JFrog OSS Repository</name>
-            <url></url>
+            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local</url>
         </snapshotRepository>
         <repository>
             <id>bintray-nickrobison-maven</id>
