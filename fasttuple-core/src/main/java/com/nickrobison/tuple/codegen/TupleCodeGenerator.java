@@ -1,7 +1,7 @@
 package com.nickrobison.tuple.codegen;
 
-import com.nickrobison.tuple.FastTuple;
 import com.google.common.collect.Lists;
+import com.nickrobison.tuple.FastTuple;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.commons.compiler.Location;
 import org.codehaus.janino.ClassBodyEvaluator;
@@ -10,14 +10,15 @@ import org.codehaus.janino.Mod;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static com.nickrobison.tuple.codegen.CodegenUtil.nullConstructor;
 import static java.lang.Character.toUpperCase;
-import static com.nickrobison.tuple.codegen.CodegenUtil.*;
 
 /**
  * Created by cliff on 5/3/14.
  */
 public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
-    private static AtomicLong counter = new AtomicLong(0l);
+    private static AtomicLong counter = new AtomicLong(0L);
     protected static Class[] types = new Class[] {
             Long.TYPE,
             Integer.TYPE,
@@ -50,10 +51,9 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
     }
 
     protected Java.CompilationUnit makeCompilationUnit() throws CompileException {
-        Java.CompilationUnit cu = new Java.CompilationUnit(null);
+        Java.CompilationUnit cu = new Java.CompilationUnit(null, new Java.CompilationUnit.SingleTypeImportDeclaration[]{new Java.CompilationUnit.SingleTypeImportDeclaration(loc, "com.nickrobison.tuple.unsafe.Coterie".split("\\."))});
         Location loc = new Location("", ((short) 0), ((short) 0));
         cu.setPackageDeclaration(new Java.PackageDeclaration(loc, "com.nickrobison.tuple"));
-        cu.addImportDeclaration(new Java.CompilationUnit.SingleTypeImportDeclaration(loc, "com.nickrobison.tuple.unsafe.Coterie".split("\\.")));
         Class[] ifaces;
         if (iface != null) {
             ifaces = new Class[] {iface};
@@ -63,7 +63,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         Java.PackageMemberClassDeclaration cd = new Java.PackageMemberClassDeclaration(
                 loc,
                 null, //doc
-                new Java.Modifiers(Mod.PUBLIC),
+                new Java.AccessModifier[]{new Java.AccessModifier("public", loc)},
                 className,
                 null, //type parameters
                 classToType(loc, FastTuple.class), //class to extend
@@ -99,13 +99,14 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
          return new Java.MethodDeclarator(
                  loc,
                  null,
-                 new Java.Modifiers(Mod.PUBLIC),
+                 new Java.AccessModifier[]{new Java.AccessModifier("public", loc)},
                  null,
                  classToType(loc, Object.class),
                  "get",
                  new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[] {
-                         new Java.FunctionDeclarator.FormalParameter(loc,true, classToType(loc, Integer.TYPE), "index")}, false),
+                         new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier("public", loc)}, classToType(loc, Integer.TYPE), "index")}, false),
                  new Java.Type[] {},
+                 null,
                  Lists.<Java.BlockStatement>newArrayList(
                          new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[] {"index"}), generateIndexedGetterImpl())
                  )
@@ -118,13 +119,14 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
             methods.add(new Java.MethodDeclarator(
                 loc,
                 null,
-                new Java.Modifiers(Mod.PUBLIC),
+                    new Java.AccessModifier[]{new Java.AccessModifier("public", loc)},
                 null,
                 new Java.PrimitiveType(loc, primIndex(types[i])),
                 "get" + capitalize(types[i].getName()),
                 new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[] {
-                        new Java.FunctionDeclarator.FormalParameter(loc, true, new Java.PrimitiveType(loc, Java.Primitive.INT), "index")}, false),
+                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier("public", loc)}, new Java.PrimitiveType(loc, Java.Primitive.INT), "index")}, false),
                 new Java.Type[] {},
+                    null,
                 Lists.<Java.BlockStatement>newArrayList(
                         new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[] {"index"}), generateIndexedGetterImpl(types[i]))
                 )
@@ -139,15 +141,16 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
             methods.add(new Java.MethodDeclarator(
                 loc,
                 null,
-                new Java.Modifiers(Mod.PUBLIC),
+                    new Java.AccessModifier[]{new Java.AccessModifier("public", loc)},
                 null,
                 new Java.PrimitiveType(loc, Java.Primitive.VOID),
                 "set" + capitalize(types[i].getName()),
                 new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[] {
-                        new Java.FunctionDeclarator.FormalParameter(loc, true, new Java.PrimitiveType(loc, Java.Primitive.INT), "index"),
-                        new Java.FunctionDeclarator.FormalParameter(loc, true, new Java.PrimitiveType(loc, primIndex(types[i])), "value")
+                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier("public", loc)}, new Java.PrimitiveType(loc, Java.Primitive.INT), "index"),
+                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier("public", loc)}, new Java.PrimitiveType(loc, primIndex(types[i])), "value")
                 }, false),
                 new Java.Type[] {},
+                    null,
                 Lists.<Java.BlockStatement>newArrayList(
                         new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[] {"index"}), generateIndexedSetterImpl("value", types[i]))
                 )
@@ -160,15 +163,16 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         return new Java.MethodDeclarator(
                 loc,
                 null,
-                new Java.Modifiers(Mod.PUBLIC),
+                new Java.AccessModifier[]{new Java.AccessModifier("public", loc)},
                 null,
                 classToType(loc, Void.TYPE),
                 "set",
                 new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[] {
-                        new Java.FunctionDeclarator.FormalParameter(loc, true, classToType(loc, Integer.TYPE), "index"),
-                        new Java.FunctionDeclarator.FormalParameter(loc, true, classToType(loc, Object.class), "value")
+                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier("public", loc)}, classToType(loc, Integer.TYPE), "index"),
+                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier("public", loc)}, classToType(loc, Object.class), "value")
                 },false),
                 new Java.Type[] {},
+                null,
                 Lists.<Java.BlockStatement>newArrayList(
                     new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[] {"index"}), generateIndexedSetterImpl("value"))
                 )
@@ -186,12 +190,13 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         return new Java.MethodDeclarator(
                 loc,
                 null,
-                new Java.Modifiers(Mod.PUBLIC),
+                new Java.AccessModifier[]{new Java.AccessModifier("public", loc)},
                 null,
                 classToType(loc, type),
                 name,
                 new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[] {}, false),
                 new Java.Type[] {},
+                null,
                 Lists.newArrayList(st)
         );
     }
@@ -201,14 +206,15 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         return new Java.MethodDeclarator(
                 loc,
                 null,
-                new Java.Modifiers(Mod.PUBLIC),
+                new Java.AccessModifier[]{new Java.AccessModifier("public", loc)},
                 null,
                 classToType(loc, Void.TYPE),
                 name,
                 new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[] {
-                    new Java.FunctionDeclarator.FormalParameter(loc, true, classToType(loc, type), "value")
+                    new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier("public", loc)}, classToType(loc, type), "value")
                 }, false),
                 new Java.Type[] {},
+                null,
                 Lists.newArrayList(st)
         );
     }
@@ -254,16 +260,16 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                                 new Java.NewClassInstance(
                                         loc,
                                         null,
-                                        new Java.ReferenceType(loc, new String[] {"IllegalArgumentException"}, null),
+                                        new Java.ReferenceType(loc, new Java.NormalAnnotation[]{}, new String[] {"IllegalArgumentException"}, null),
                                         new Java.Rvalue[0]))
                 ));
     }
 
     protected Java.Type classToRefType(Class type) {
         if (type.isPrimitive()) {
-            return new Java.ReferenceType(loc, primToBox(type).split("\\."), null);
+            return new Java.ReferenceType(loc, new Java.NormalAnnotation[]{}, primToBox(type).split("\\."), null);
         } else {
-            return new Java.ReferenceType(loc, type.getCanonicalName().split("\\."), null);
+            return new Java.ReferenceType(loc, new Java.NormalAnnotation[]{}, type.getCanonicalName().split("\\."), null);
         }
     }
 }

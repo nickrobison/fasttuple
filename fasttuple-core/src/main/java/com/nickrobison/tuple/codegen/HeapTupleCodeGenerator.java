@@ -23,7 +23,7 @@ public class HeapTupleCodeGenerator extends TupleCodeGenerator {
             declarations[i] = new Java.FieldDeclaration(
                     loc,
                     null,
-                    new Java.Modifiers(Mod.PUBLIC),
+                    new Java.AccessModifier[]{new Java.AccessModifier("public", loc)},
                     classToType(loc, fieldTypes[i]),
                     new Java.VariableDeclarator[] {
                             new Java.VariableDeclarator(loc, fieldNames[i], 0, null)
