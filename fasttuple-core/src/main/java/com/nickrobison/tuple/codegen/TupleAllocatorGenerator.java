@@ -35,7 +35,7 @@ public class TupleAllocatorGenerator extends ClassBodyEvaluator {
         return (TupleAllocator) allocatorClass.getConstructor().newInstance();
     }
 
-    private Java.PackageMemberClassDeclaration makeClassDefinition(Location loc, Class tupleClass, String className) throws Exception {
+    private Java.PackageMemberClassDeclaration makeClassDefinition(Location loc, Class tupleClass, String className) {
         Java.PackageMemberClassDeclaration cd = new Java.PackageMemberClassDeclaration(
                 loc,
                 null,
