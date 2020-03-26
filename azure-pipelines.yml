@@ -3,12 +3,11 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
-pool:
-  vmImage: $(imageName)
-
 stages:
   - stage: Build
     displayName: Build and Test
+    pool:
+      vmImage: $(imageName)
     jobs:
       - job: Build
         strategy:
@@ -64,7 +63,7 @@ stages:
               mavenPomFile: 'pom.xml'
               mavenOptions: '-Xmx3072m'
               javaHomeOption: 'JDKVersion'
-              jdkVersionOption: '$(jdk)'
+              jdkVersionOption: '1.8'
               jdkArchitectureOption: 'x64'
               mavenAuthenticateFeed: true
               publishJUnitResults: false
