@@ -54,9 +54,10 @@ stages:
             inputs:
               pollingTimeoutSec: '300'
   - stage: Deploy
-    displayName: Build and Test
+    displayName: Deploy to Maven
+    dependsOn: Build
     jobs:
-      - job: Build
+      - job: Deploy
         steps:
           - task: Maven@3
             inputs:
