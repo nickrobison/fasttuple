@@ -55,6 +55,7 @@ stages:
   - stage: Deploy
     displayName: Deploy to Maven
     dependsOn: Build
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
     jobs:
       - job: Deploy
         steps:
