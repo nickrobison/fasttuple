@@ -53,4 +53,22 @@ stages:
           - task: SonarCloudPublish@1
             inputs:
               pollingTimeoutSec: '300'
+  - stage: Deploy
+    displayName: Build and Test
+    jobs:
+      - job: Build
+        steps:
+          - task: Maven@3
+            inputs:
+              mavenPomFile: 'pom.xml'
+              mavenOptions: '-Xmx3072m'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '$(jdk)'
+              jdkArchitectureOption: 'x64'
+              mavenAuthenticateFeed: true
+              publishJUnitResults: false
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              goals: 'deploy'
+
+
 
