@@ -58,6 +58,7 @@ stages:
     jobs:
       - job: Deploy
         steps:
+          - task: MavenAuthenticate@0
           - task: Maven@3
             inputs:
               mavenPomFile: 'pom.xml'
