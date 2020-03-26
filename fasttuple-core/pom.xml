@@ -12,7 +12,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <janino.version>3.1.0</janino.version>
+        <janino.version>3.1.2</janino.version>
     </properties>
 
     <dependencies>
