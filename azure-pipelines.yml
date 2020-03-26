@@ -3,27 +3,6 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
-strategy:
-  matrix:
-    Linux_Java8:
-      imageName: 'ubuntu-latest'
-      jdk: '1.8'
-    # Linux_Java11:
-    #   imageName: 'ubuntu-latest'
-    #   jdk: '1.11'
-    Mac_Java8:
-      jdk: '1.8'
-      imageName: 'macos-10.14'
-    # Mac_Java11:
-    #   jdk: '1.11'
-    #   imageName: 'macos-10.14'
-    Windows_Java8:
-      imageName: 'vs2017-win2016'
-      jdk: '1.8'
-    # Windows_Java11:
-    #   imageName: 'vs2017-win2016'
-    #   jdk: '1.11'
-
 pool:
   vmImage: $(imageName)
 
@@ -32,6 +11,26 @@ stages:
     displayName: Build and Test
     jobs:
       - job: Build
+        strategy:
+          matrix:
+            Linux_Java8:
+              imageName: 'ubuntu-latest'
+              jdk: '1.8'
+            # Linux_Java11:
+            #   imageName: 'ubuntu-latest'
+            #   jdk: '1.11'
+            Mac_Java8:
+              jdk: '1.8'
+              imageName: 'macos-10.14'
+            # Mac_Java11:
+            #   jdk: '1.11'
+            #   imageName: 'macos-10.14'
+            Windows_Java8:
+              imageName: 'vs2017-win2016'
+              jdk: '1.8'
+            # Windows_Java11:
+            #   imageName: 'vs2017-win2016'
+            #   jdk: '1.11'
         steps:
           - task: SonarCloudPrepare@1
             inputs:
@@ -54,5 +53,4 @@ stages:
           - task: SonarCloudPublish@1
             inputs:
               pollingTimeoutSec: '300'
-
 
