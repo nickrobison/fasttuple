@@ -121,4 +121,16 @@
         </license>
     </licenses>
 
+    <distributionManagement>
+        <repository>
+            <id>bintray-nickrobison-maven</id>
+            <name>nickrobison-maven</name>
+            <url>https://api.bintray.com/maven/nickrobison/maven/fasttuple/;publish=1</url>
+        </repository>
+        <snapshotRepository>
+            <id>bintray-nickrobison-maven</id>
+            <name>JFrog OSS Repository</name>
+            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
