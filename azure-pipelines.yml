@@ -75,7 +75,7 @@ stages:
             artifact: artifacts
           - task: CopyFiles@2
             inputs:
-              sourceFolder: $(Build.ArtifactStagingDirectory)/artifacts
+              sourceFolder: $(Build.DefaultWorkingDirectory)/artifacts
               targetFolder: $(System.DefaultWorkingDirectory)
           - task: MavenAuthenticate@0
             inputs:
