@@ -52,7 +52,7 @@ stages:
           - task: SonarCloudPublish@1
             inputs:
               pollingTimeoutSec: '300'
-          - publish: $(System.DefaultWorkingDirectory)/**/
+          - publish: $(System.DefaultWorkingDirectory)
   - stage: Deploy
     displayName: Deploy to Maven
     dependsOn: Build
