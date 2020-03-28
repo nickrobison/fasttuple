@@ -5,11 +5,38 @@
 
 stages:
   - stage: Build
-    displayName: Build and Test
+    displayName: Build Source Code
+    pool:
+      vmImage: "ubuntu-latest"
+    steps:
+      - task: SonarCloudPrepare@1
+        inputs:
+          SonarCloud: 'Sonar Cloud (FastTuple)'
+          organization: 'nickrobison-github'
+          scannerMode: 'Other'
+      - task: Maven@3
+        inputs:
+          mavenPomFile: 'pom.xml'
+          mavenOptions: '-Xmx3072m'
+          javaHomeOption: 'JDKVersion'
+          jdkVersionOption: '$(jdk)'
+          jdkArchitectureOption: 'x64'
+          goals: 'test-compile'
+          sonarQubeRunAnalysis: true
+      - task: SonarCloudPublish@1
+        inputs:
+          pollingTimeoutSec: '300'
+      - task: CopyFiles@2
+        inputs:
+          targetFolder: $(Build.ArtifactStagingDirectory)
+      - publish: $(Build.ArtifactStagingDirectory)
+        artifact: artifacts
+  - stage: Test
+    displayName: Run Cross-Platform Tests
     pool:
       vmImage: $(imageName)
     jobs:
-      - job: Build
+      - job: Test
         strategy:
           matrix:
             Linux_Java8:
@@ -31,11 +58,12 @@ stages:
             #   imageName: 'vs2017-win2016'
             #   jdk: '1.11'
         steps:
-          - task: SonarCloudPrepare@1
+          - download: current
+              artifact: artifacts
+          - task: CopyFiles@2
             inputs:
-              SonarCloud: 'Sonar Cloud (FastTuple)'
-              organization: 'nickrobison-github'
-              scannerMode: 'Other'
+              sourceFolder: $(Pipeline.Workspace)/artifacts
+              targetFolder: $(Build.SourcesDirectory)
           - task: Maven@3
             inputs:
               mavenPomFile: 'pom.xml'
@@ -45,19 +73,7 @@ stages:
               jdkArchitectureOption: 'x64'
               publishJUnitResults: true
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              goals: 'package'
-              sonarQubeRunAnalysis: true
-          #              codeCoverageToolOption: 'jaCoCo'
-          #              codeCoverageSourceDirectories: 'fasttuple-core/src/main/java'
-          - task: SonarCloudPublish@1
-            inputs:
-              pollingTimeoutSec: '300'
-          - task: CopyFiles@2
-            inputs:
-              contents: '**/*.jar'
-              targetFolder: $(Build.ArtifactStagingDirectory)
-          - publish: $(Build.ArtifactStagingDirectory)
-            artifact: artifacts
+              goals: 'test'
   - stage: Deploy
     displayName: Deploy to Maven
     dependsOn: Build
@@ -84,9 +100,7 @@ stages:
               jdkVersionOption: '1.8'
               jdkArchitectureOption: 'x64'
               mavenAuthenticateFeed: true
-              publishJUnitResults: false
-              testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              goals: 'deploy:deploy'
+              goals: 'deploy'
 
 
 
