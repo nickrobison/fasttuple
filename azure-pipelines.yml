@@ -18,15 +18,15 @@ stages:
             # Linux_Java11:
             #   imageName: 'ubuntu-latest'
             #   jdk: '1.11'
-            Mac_Java8:
-              jdk: '1.8'
-              imageName: 'macos-10.14'
-            # Mac_Java11:
-            #   jdk: '1.11'
-            #   imageName: 'macos-10.14'
-            Windows_Java8:
-              imageName: 'vs2017-win2016'
-              jdk: '1.8'
+#            Mac_Java8:
+#              jdk: '1.8'
+#              imageName: 'macos-10.14'
+#            # Mac_Java11:
+#            #   jdk: '1.11'
+#            #   imageName: 'macos-10.14'
+#            Windows_Java8:
+#              imageName: 'vs2017-win2016'
+#              jdk: '1.8'
             # Windows_Java11:
             #   imageName: 'vs2017-win2016'
             #   jdk: '1.11'
@@ -52,7 +52,12 @@ stages:
           - task: SonarCloudPublish@1
             inputs:
               pollingTimeoutSec: '300'
-          - publish: $(System.DefaultWorkingDirectory)
+          - task: PowerShell@2
+            inputs:
+              filePath: azure/CopyDependencies.ps1
+              arguments: pack
+              displayName: Archive JARs
+          - publish: $(System.DefaultWorkingDirectory)/artifacts
             artifact: Jars
   - stage: Deploy
     displayName: Deploy to Maven
@@ -63,6 +68,11 @@ stages:
         steps:
           - download: current
             artifact: Jars
+          - task: PowerShell@2
+            inputs:
+              filePath: azure/CopyDependencies.ps1
+              arguments: unpack
+              displayName: Unarchive JARs
           - task: MavenAuthenticate@0
             inputs:
               mavenServiceConnections: 'jCenter maven'
