@@ -71,7 +71,7 @@ stages:
           - task: PowerShell@2
             inputs:
               filePath: azure/CopyDependencies.ps1
-              arguments: unpack
+              arguments: unpack -ArchiveDir .\Jars
               displayName: Unarchive JARs
           - task: MavenAuthenticate@0
             inputs:
