@@ -30,6 +30,7 @@ stages:
               pollingTimeoutSec: '300'
           - task: CopyFiles@2
             inputs:
+              contents: "fasttuple-*/**"
               targetFolder: $(Build.ArtifactStagingDirectory)
           - publish: $(Build.ArtifactStagingDirectory)
             artifact: artifacts
