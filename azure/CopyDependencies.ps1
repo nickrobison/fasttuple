@@ -9,6 +9,8 @@ Param(
 
 $cwd = Get-Location
 Write-Host "Running from: $cwd"
+Write-Host "Root: $RootDir"
+Write-Host "Archive: $ArchiveDir"
 
 function Pack-Jars
 {
