@@ -72,7 +72,7 @@ stages:
           - task: CopyFiles@2
             inputs:
               sourceFolder: $(Pipeline.Workspace)/artifacts
-              targetFolder: $(Build.ArtifactStagingDirectory)
+              targetFolder: $(Build.SourcesDirectory)
           - task: MavenAuthenticate@0
             inputs:
               mavenServiceConnections: 'jCenter maven'
