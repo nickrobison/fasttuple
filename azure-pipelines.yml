@@ -56,10 +56,6 @@ stages:
             inputs:
               contents: '**/*.jar'
               targetFolder: $(Build.ArtifactStagingDirectory)
-              #cleanTargetFolder: false # Optional
-              #overWrite: false # Optional
-              #flattenFolders: false # Optional
-              #preserveTimestamp: false # Optional
           - publish: $(Build.ArtifactStagingDirectory)
             artifact: artifacts
   - stage: Deploy
@@ -75,8 +71,8 @@ stages:
             artifact: artifacts
           - task: CopyFiles@2
             inputs:
-              sourceFolder: $(Build.DefaultWorkingDirectory)/artifacts
-              targetFolder: $(System.DefaultWorkingDirectory)
+              sourceFolder: $(Pipeline.Workspace)/artifacts
+              targetFolder: $(Pipeline.Workspace)
           - task: MavenAuthenticate@0
             inputs:
               mavenServiceConnections: 'jCenter maven'
