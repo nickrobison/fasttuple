@@ -58,7 +58,7 @@ stages:
               arguments: pack
               displayName: Archive JARs
           - publish: $(System.DefaultWorkingDirectory)/artifacts
-            artifact: Jars
+            artifact: artifacts
   - stage: Deploy
     displayName: Deploy to Maven
     dependsOn: Build
@@ -67,11 +67,11 @@ stages:
       - job: Deploy
         steps:
           - download: current
-            artifact: Jars
+            artifact: artifacts
           - task: PowerShell@2
             inputs:
               filePath: azure/CopyDependencies.ps1
-              arguments: unpack -ArchiveDir .\Jars
+              arguments: unpack
               displayName: Unarchive JARs
           - task: MavenAuthenticate@0
             inputs:
