@@ -53,6 +53,7 @@ stages:
             inputs:
               pollingTimeoutSec: '300'
           - publish: $(System.DefaultWorkingDirectory)
+            artifact: Jars
   - stage: Deploy
     displayName: Deploy to Maven
     dependsOn: Build
@@ -60,6 +61,8 @@ stages:
     jobs:
       - job: Deploy
         steps:
+          - download: current
+            artifact: Jars
           - task: MavenAuthenticate@0
             inputs:
               mavenServiceConnections: 'jCenter maven'
