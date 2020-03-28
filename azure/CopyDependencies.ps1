@@ -3,9 +3,9 @@ Param(
 [string]$ArchiveDir = ".\artifacts\",
 [Parameter(Position=0, Mandatory=$true)][string]$Cmd
 )
-
-$RootDir = $RootDir.Trimend("\") + "\"
-$ArchiveDir = $ArchiveDir.Trimend("\") + "\"
+#
+#$RootDir = $RootDir.Trimend("\") + "\"
+#$ArchiveDir = $ArchiveDir.Trimend("\") + "\"
 
 $cwd = Get-Location
 Write-Host "Running from: $cwd"
