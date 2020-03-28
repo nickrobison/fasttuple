@@ -3,9 +3,9 @@ Param(
 [string]$ArchiveDir = ".\artifacts\",
 [Parameter(Position=0, Mandatory=$true)][string]$Cmd
 )
-#
-#$RootDir = $RootDir.Trimend("\") + "\"
-#$ArchiveDir = $ArchiveDir.Trimend("\") + "\"
+
+$RootDir = $RootDir.Trimend("\") + "\"
+$ArchiveDir = $ArchiveDir.Trimend("\") + "\"
 
 $cwd = Get-Location
 Write-Host "Running from: $cwd"
@@ -16,7 +16,7 @@ function Pack-Jars
 {
     Get-ChildItem $RootDir -filter "*.jar" -recurse | `
     foreach{
-        $targetFile = $ArchiveDir + $_.FullName.SubString($cwd.Length);
+        $targetFile = $ArchiveDir + $_.FullName.SubString($cwd.ToString().Length);
         New-Item -ItemType File -Path $targetFile -Force;
         Copy-Item $_.FullName -destination $targetFile
     }
@@ -24,9 +24,9 @@ function Pack-Jars
 
 function Unpack-Jars
 {
-    Get-ChildItem $RootDir -filter "*.jar" -recurse | `
+    Get-ChildItem $ArchiveDir -filter "*.jar" -recurse | `
     foreach{
-        $targetFile = "\" + $_.FullName.SubString($cwd.Length);
+        $targetFile = "\" + $_.FullName.SubString($cwd.ToString().Length);
         New-Item -ItemType File -Path $targetFile -Force;
         Copy-Item $_.FullName -destination $targetFile
     }

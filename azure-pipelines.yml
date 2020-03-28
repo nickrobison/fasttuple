@@ -72,7 +72,7 @@ stages:
             artifact: artifacts
           - task: PowerShell@2
             inputs:
-              filePath: azure/CopyDependencies.ps1
+              filePath: azure/CopyDependencies.ps1 -ArchiveDir /home/vsts/work/1/artifacts
               arguments: unpack
               displayName: Unarchive JARs
           - task: MavenAuthenticate@0
