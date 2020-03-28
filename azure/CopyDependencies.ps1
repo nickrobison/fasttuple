@@ -24,7 +24,7 @@ function Pack-Jars
 
 function Unpack-Jars
 {
-    Get-ChildItem "$ArchiveDir" -filter "*.jar" -recurse | `
+    Get-ChildItem $RootDir -filter "*.jar" -recurse | `
     foreach{
         $targetFile = "\" + $_.FullName.SubString($cwd.Length);
         New-Item -ItemType File -Path $targetFile -Force;
