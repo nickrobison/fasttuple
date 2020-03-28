@@ -8,29 +8,31 @@ stages:
     displayName: Build Source Code
     pool:
       vmImage: "ubuntu-latest"
-    steps:
-      - task: SonarCloudPrepare@1
-        inputs:
-          SonarCloud: 'Sonar Cloud (FastTuple)'
-          organization: 'nickrobison-github'
-          scannerMode: 'Other'
-      - task: Maven@3
-        inputs:
-          mavenPomFile: 'pom.xml'
-          mavenOptions: '-Xmx3072m'
-          javaHomeOption: 'JDKVersion'
-          jdkVersionOption: '$(jdk)'
-          jdkArchitectureOption: 'x64'
-          goals: 'test-compile'
-          sonarQubeRunAnalysis: true
-      - task: SonarCloudPublish@1
-        inputs:
-          pollingTimeoutSec: '300'
-      - task: CopyFiles@2
-        inputs:
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - publish: $(Build.ArtifactStagingDirectory)
-        artifact: artifacts
+    jobs:
+      - job: Compile
+        steps:
+          - task: SonarCloudPrepare@1
+            inputs:
+              SonarCloud: 'Sonar Cloud (FastTuple)'
+              organization: 'nickrobison-github'
+              scannerMode: 'Other'
+          - task: Maven@3
+            inputs:
+              mavenPomFile: 'pom.xml'
+              mavenOptions: '-Xmx3072m'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.8'
+              jdkArchitectureOption: 'x64'
+              goals: 'test-compile'
+              sonarQubeRunAnalysis: true
+          - task: SonarCloudPublish@1
+            inputs:
+              pollingTimeoutSec: '300'
+          - task: CopyFiles@2
+            inputs:
+              targetFolder: $(Build.ArtifactStagingDirectory)
+          - publish: $(Build.ArtifactStagingDirectory)
+            artifact: artifacts
   - stage: Test
     displayName: Run Cross-Platform Tests
     pool:
