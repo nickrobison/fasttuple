@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
     jacoco
     id("org.sonarqube") version "3.0"
-    id("info.solidsoft.pitest") version "1.5.2"
+    id("info.solidsoft.pitest") version "1.5.2" apply (false)
 }
 
 val janinoVersion by extra("3.1.0")
@@ -19,7 +19,6 @@ allprojects {
     apply(plugin = "java")
     apply(plugin = "jacoco")
     apply(plugin = "maven-publish")
-    apply(plugin = "info.solidsoft.pitest")
 
     repositories {
         jcenter()
@@ -41,15 +40,6 @@ allprojects {
     tasks.jacocoTestReport {
         reports {
             xml.isEnabled = true
-        }
-    }
-
-    configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
-        junit5PluginVersion.set("0.12")
-        targetClasses.add("com.nickrobison.tuple.*")
-
-        if (project.name in setOf("fasttuple-bench", "fasttuple")) {
-            failWhenNoMutations.set(false)
         }
     }
 
