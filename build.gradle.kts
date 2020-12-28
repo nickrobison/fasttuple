@@ -48,7 +48,7 @@ allprojects {
         junit5PluginVersion.set("0.12")
         targetClasses.add("com.nickrobison.tuple.*")
 
-        if (project.name in setOf("fasttuple-bench")) {
+        if (project.name in setOf("fasttuple-bench", "fasttuple")) {
             failWhenNoMutations.set(false)
         }
     }
