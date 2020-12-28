@@ -156,6 +156,20 @@ public class TupleExpressionGeneratorTest {
     }
 
     @Test
+    public void testGetByteOut() throws Exception {
+        TupleSchema schema = TupleSchema.builder().
+                addField("a", Byte.TYPE).
+                heapMemory().
+                build();
+
+        FastTuple tuple = schema.createTuple();
+        tuple.setByte(1, (byte) 'h');
+
+        TupleExpressionGenerator.ByteTupleExpression eval = TupleExpressionGenerator.builder().expression("tuple.a ").schema(schema).returnByte();
+        assertEquals((byte) 'h', eval.evaluate(tuple));
+    }
+
+    @Test
     public void testMultiExpr() throws Exception {
         TupleSchema schema = TupleSchema.builder().
                 addField("a", Long.TYPE).
