@@ -1,4 +1,4 @@
-val jmhVersion = "1.27"
+val jmhVersion = "1.34"
 
 dependencies {
     implementation(project(":fasttuple-core"))
