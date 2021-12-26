@@ -44,6 +44,14 @@ allprojects {
         }
     }
 
+    sonarqube {
+        properties {
+            property("sonar.projectKey", "com.nickrobison:fasttuple")
+            property("sonar.organization", "nickrobison-github")
+            property("sonar.host.url", "https://sonarcloud.io")
+        }
+    }
+
     publishing {
         publications {
             create<MavenPublication>("mavenJava") {
