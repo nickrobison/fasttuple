@@ -8,7 +8,7 @@ dependencies {
 }
 
 plugins {
-    id("com.github.johnrengelman.shadow") version "5.2.0"
+    id("com.github.johnrengelman.shadow") version "7.1.1"
     application
 }
 
