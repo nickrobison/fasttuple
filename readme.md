@@ -1,7 +1,8 @@
-[![Build Status](https://nickrobison.visualstudio.com/FastTuple/_apis/build/status/nickrobison.fasttuple?branchName=master)](https://nickrobison.visualstudio.com/FastTuple/_build/latest?definitionId=3&branchName=master)
+[![Build Status](https://github.com/nickrobison/fasttuple/actions/workflows/build.yaml/badge.svg)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.nickrobison/fasttuple-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.nickrobison/fasttuple-core)
 [![JavaDoc](http://www.javadoc.io/badge/com.nickrobison/fasttuple-core.svg)](http://www.javadoc.io/doc/com.nickrobison/fasttuple-core)
 [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.nickrobison%3Afasttuple&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=com.nickrobison%3Afasttuple)
 
 # FastTuple
 
