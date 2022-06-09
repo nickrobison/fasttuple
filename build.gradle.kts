@@ -3,7 +3,7 @@ plugins {
     signing
     `maven-publish`
     jacoco
-    id("org.sonarqube") version "3.3"
+    id("org.sonarqube") version "3.4.0.2513"
     id("info.solidsoft.pitest") version "1.7.0" apply (false)
     id("net.researchgate.release") version "2.8.1"
 }
