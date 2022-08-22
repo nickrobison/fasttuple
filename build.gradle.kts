@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
     jacoco
     id("org.sonarqube") version "3.3"
-    id("info.solidsoft.pitest") version "1.7.0" apply (false)
+    id("info.solidsoft.pitest") version "1.9.0" apply (false)
     id("net.researchgate.release") version "2.8.1"
 }
 
