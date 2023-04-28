@@ -22,7 +22,6 @@ jobs:
           - 1.8
           - 11
           - 17
-          - 20
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
