@@ -22,11 +22,10 @@ jobs:
           - 1.8
           - 11
           - 17
+          - 20
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # Disable shallow clones so Sonar can have all the data
       - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v1
         with:
