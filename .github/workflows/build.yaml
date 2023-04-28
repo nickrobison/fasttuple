@@ -9,6 +9,10 @@ on:
     paths:
       - .github/workflows/build.yaml
 
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
