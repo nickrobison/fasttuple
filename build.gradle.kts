@@ -40,7 +40,7 @@ allprojects {
 
     tasks.jacocoTestReport {
         reports {
-            xml.isEnabled = true
+            xml.required.set(true)
         }
     }
 

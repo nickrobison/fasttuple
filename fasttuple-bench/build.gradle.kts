@@ -8,12 +8,12 @@ dependencies {
 }
 
 plugins {
-    id("com.github.johnrengelman.shadow") version "5.2.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     application
 }
 
 application {
-    mainClassName = "org.openjdk.jmh.Main"
+    mainClass.set("org.openjdk.jmh.Main")
 }
 
 tasks.shadowJar {
