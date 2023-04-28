@@ -35,7 +35,7 @@ allprojects {
         val implementation by configurations
         val api by configurations
         api("org.codehaus.janino:janino:$janinoVersion")
-        implementation("com.google.guava:guava:31.0.1-jre")
+        implementation("com.google.guava:guava:31.1-jre")
     }
 
     tasks.jacocoTestReport {
