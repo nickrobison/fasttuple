@@ -46,7 +46,7 @@ allprojects {
 
     sonarqube {
         properties {
-            property("sonar.projectKey", "com.nickrobison:fasttuple")
+            property("sonar.projectKey", "nickrobison_fasttuple")
             property("sonar.organization", "nickrobison-github")
             property("sonar.host.url", "https://sonarcloud.io")
         }
