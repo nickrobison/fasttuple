@@ -3,7 +3,7 @@ plugins {
     signing
     `maven-publish`
     jacoco
-    id("org.sonarqube") version "3.3"
+    id("org.sonarqube") version "4.0.0.2929"
     id("info.solidsoft.pitest") version "1.7.0" apply (false)
     id("net.researchgate.release") version "2.8.1"
 }
@@ -46,7 +46,7 @@ allprojects {
 
     sonarqube {
         properties {
-            property("sonar.projectKey", "com.nickrobison:fasttuple")
+            property("sonar.projectKey", "nickrobison_fasttuple")
             property("sonar.organization", "nickrobison-github")
             property("sonar.host.url", "https://sonarcloud.io")
         }
