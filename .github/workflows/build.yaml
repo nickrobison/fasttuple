@@ -10,7 +10,7 @@ on:
       - .github/workflows/build.yaml
 
 concurrency:
-  group: ${{ github.head_ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
