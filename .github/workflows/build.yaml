@@ -25,7 +25,8 @@ jobs:
         java-version:
           - 11
           - 17
-          - 20
+          - 21
+          - 23
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
