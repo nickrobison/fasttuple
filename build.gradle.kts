@@ -125,6 +125,8 @@ allprojects {
     }
 
     configure<ReleaseExtension> {
+        failOnPublishNeeded = false
+        failOnCommitNeeded = false
         with(git) {
             requireBranch = "master"
         }
