@@ -30,13 +30,6 @@ allprojects {
         withSourcesJar()
     }
 
-    dependencies {
-        val implementation by configurations
-        val api by configurations
-        api("org.codehaus.janino:janino:$janinoVersion")
-        implementation("com.google.guava:guava:33.4.0-jre")
-    }
-
     tasks.jacocoTestReport {
         reports {
             xml.required.set(true)
