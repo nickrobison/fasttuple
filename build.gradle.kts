@@ -125,9 +125,6 @@ allprojects {
     }
 
     configure<ReleaseExtension> {
-        failOnPublishNeeded = false
-        failOnCommitNeeded = false
-        versionPropertyFile = "gradle.properties"
         with(git) {
             requireBranch = "master"
             signTag = true
