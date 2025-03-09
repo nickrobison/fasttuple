@@ -3,11 +3,10 @@ on:
   workflow_dispatch: # because sometimes you just want to force a branch to have tests run
   push:
     branches:
-      - "**"
+      - master
+  pull_request:
     paths:
       - .github/workflows/coverity.yaml
-  schedule:
-    - cron: '0 0 1 * *' # Monthly on the 1st at 00:00 UTC
 
 jobs:
   scan:

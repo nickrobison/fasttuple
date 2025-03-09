@@ -1,9 +1,14 @@
 name: Maven Deploy
 on:
   workflow_dispatch: # because sometimes you just want to force a branch to have tests run
-  push:
+  workflow_run:
+    workflows:
+      - 'Build and test'
+    types:
+      - completed
     branches:
       - master
+  pull_request:
     paths:
       - .github/workflows/deploy.yaml
 
