@@ -2,11 +2,12 @@ package com.nickrobison.tuple.codegen;
 
 import com.nickrobison.tuple.FastTuple;
 import com.nickrobison.tuple.TupleSchema;
-import com.google.common.collect.Lists;
 import org.codehaus.commons.compiler.Location;
 import org.codehaus.janino.*;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -16,44 +17,44 @@ import static com.nickrobison.tuple.codegen.CodegenUtil.*;
  * Created by cliff on 5/12/14.
  */
 public class TupleExpressionGenerator extends ClassBodyEvaluator {
-    public static interface TupleExpression {
-        public void evaluate(FastTuple tuple);
+    public interface TupleExpression {
+        void evaluate(FastTuple tuple);
     }
 
-    public static interface ObjectTupleExpression {
-        public Object evaluate(FastTuple tuple);
+    public interface ObjectTupleExpression {
+        Object evaluate(FastTuple tuple);
     }
 
-    public static interface LongTupleExpression {
-        public long evaluate(FastTuple tuple);
+    public interface LongTupleExpression {
+        long evaluate(FastTuple tuple);
     }
 
-    public static interface IntTupleExpression {
-        public int evaluate(FastTuple tuple);
+    public interface IntTupleExpression {
+        int evaluate(FastTuple tuple);
     }
 
-    public static interface ShortTupleExpression {
-        public short evaluate(FastTuple tuple);
+    public interface ShortTupleExpression {
+        short evaluate(FastTuple tuple);
     }
 
-    public static interface CharTupleExpression {
-        public char evaluate(FastTuple tuple);
+    public interface CharTupleExpression {
+        char evaluate(FastTuple tuple);
     }
 
-    public static interface ByteTupleExpression {
-        public byte evaluate(FastTuple tuple);
+    public interface ByteTupleExpression {
+        byte evaluate(FastTuple tuple);
     }
 
-    public static interface FloatTupleExpression {
-        public float evaluate(FastTuple tuple);
+    public interface FloatTupleExpression {
+        float evaluate(FastTuple tuple);
     }
 
-    public static interface DoubleTupleExpression {
-        public double evaluate(FastTuple tuple);
+    public interface DoubleTupleExpression {
+        double evaluate(FastTuple tuple);
     }
 
-    public static interface BooleanTupleExpression {
-        public boolean evaluate(FastTuple tuple);
+    public interface BooleanTupleExpression {
+        boolean evaluate(FastTuple tuple);
     }
 
     private static String packageName = "com.nickrobison.tuple";
@@ -172,18 +173,18 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
                 generateArgs(loc, FastTuple.class),
                 new Java.Type[0],
                 null,
-                Lists.<Java.BlockStatement>newArrayList(
+                Collections.singletonList(
                         maybeGenerateReturn(loc,
                                 new Java.MethodInvocation(
                                         loc,
                                         null,
                                         "doEval",
-                                        new Java.Rvalue[] {
-                                            new Java.Cast(
-                                                    loc,
-                                                    new Java.ReferenceType(loc, new Java.NormalAnnotation[]{}, schema.tupleClass().getCanonicalName().split("\\."), null),
-                                                    new Java.AmbiguousName(loc, new String[] {"tuple"})
-                                            )
+                                        new Java.Rvalue[]{
+                                                new Java.Cast(
+                                                        loc,
+                                                        new Java.ReferenceType(loc, new Java.NormalAnnotation[]{}, schema.tupleClass().getCanonicalName().split("\\."), null),
+                                                        new Java.AmbiguousName(loc, new String[]{"tuple"})
+                                                )
                                         }
                                 )
                         )
@@ -193,7 +194,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
 
     private Java.MethodDeclarator generateBackendMethod(Parser parser) throws Exception {
         Location loc = parser.location();
-        List<Java.BlockStatement> statements = Lists.newArrayList();
+        List<Java.BlockStatement> statements = new ArrayList<>();
         Java.Rvalue[] exprs = parser.parseExpressionList();
         for (int i=0; i<exprs.length; i++) {
             if (i == exprs.length - 1) {

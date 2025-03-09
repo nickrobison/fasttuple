@@ -1,6 +1,5 @@
 package com.nickrobison.tuple.codegen;
 
-import com.google.common.collect.Lists;
 import com.nickrobison.tuple.FastTuple;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.commons.compiler.Location;
@@ -8,6 +7,8 @@ import org.codehaus.janino.ClassBodyEvaluator;
 import org.codehaus.janino.Java;
 import org.codehaus.janino.Java.AbstractCompilationUnit.SingleTypeImportDeclaration;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -109,14 +110,14 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                         new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, classToType(loc, Integer.TYPE), INDEX)}, false),
                 new Java.Type[]{},
                 null,
-                Lists.<Java.BlockStatement>newArrayList(
+                Collections.singletonList(
                         new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[]{INDEX}), generateIndexedGetterImpl())
                 )
         );
     }
 
     protected List<Java.MethodDeclarator> generateIndexedTypedGetters() throws CompileException {
-        List<Java.MethodDeclarator> methods = Lists.newArrayList();
+        List<Java.MethodDeclarator> methods = new ArrayList<>();
         for (Class type : types) {
             methods.add(new Java.MethodDeclarator(
                     loc,
@@ -129,7 +130,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                             new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, new Java.PrimitiveType(loc, Java.Primitive.INT), INDEX)}, false),
                     new Java.Type[]{},
                     null,
-                    Lists.<Java.BlockStatement>newArrayList(
+                    Collections.singletonList(
                             new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[]{INDEX}), generateIndexedGetterImpl(type))
                     )
             ));
@@ -138,7 +139,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
     }
 
     protected List<Java.MethodDeclarator> generateIndexedTypedSetters() throws CompileException {
-        List<Java.MethodDeclarator> methods = Lists.newArrayList();
+        List<Java.MethodDeclarator> methods = new ArrayList<>();
         for (Class type : types) {
             methods.add(new Java.MethodDeclarator(
                     loc,
@@ -153,7 +154,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                     }, false),
                     new Java.Type[]{},
                     null,
-                    Lists.<Java.BlockStatement>newArrayList(
+                    Collections.singletonList(
                             new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[]{INDEX}), generateIndexedSetterImpl(VALUE, type))
                     )
             ));
@@ -175,7 +176,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                 }, false),
                 new Java.Type[]{},
                 null,
-                Lists.<Java.BlockStatement>newArrayList(
+                Collections.singletonList(
                         new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[]{INDEX}), generateIndexedSetterImpl(VALUE))
                 )
         );
@@ -202,7 +203,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                 new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{}, false),
                 new Java.Type[]{},
                 null,
-                Lists.newArrayList(st)
+                Collections.singletonList(st)
         );
     }
 
@@ -220,7 +221,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                 }, false),
                 new Java.Type[]{},
                 null,
-                Lists.newArrayList(st)
+                Collections.singletonList(st)
         );
     }
 
@@ -258,9 +259,9 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
     protected Java.SwitchStatement.SwitchBlockStatementGroup generateDefaultCase() {
         return new Java.SwitchStatement.SwitchBlockStatementGroup(
                 loc,
-                Lists.newArrayList(),
+                Collections.emptyList(),
                 true,
-                Lists.newArrayList(
+                Collections.singletonList(
                         new Java.ThrowStatement(
                                 loc,
                                 new Java.NewClassInstance(

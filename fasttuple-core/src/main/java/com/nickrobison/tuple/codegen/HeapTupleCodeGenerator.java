@@ -1,9 +1,10 @@
 package com.nickrobison.tuple.codegen;
 
-import com.google.common.collect.Lists;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.janino.Java;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,14 +36,14 @@ public class HeapTupleCodeGenerator extends TupleCodeGenerator {
 
     @Override
     protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl() throws CompileException {
-        List<Java.SwitchStatement.SwitchBlockStatementGroup> list = Lists.newArrayList();
+        List<Java.SwitchStatement.SwitchBlockStatementGroup> list = new ArrayList<>();
         for (int i = 0; i < fieldTypes.length; i++) {
             list.add(
                     new Java.SwitchStatement.SwitchBlockStatementGroup(
                             loc,
-                            Lists.<Java.Rvalue>newArrayList(new Java.IntegerLiteral(loc, String.valueOf(i + 1))),
+                            Collections.singletonList(new Java.IntegerLiteral(loc, String.valueOf(i + 1))),
                             false,
-                            Lists.<Java.BlockStatement>newArrayList(new Java.ReturnStatement(loc, generateGetInvocation(fieldTypes[i], i)))
+                            Collections.singletonList(new Java.ReturnStatement(loc, generateGetInvocation(fieldTypes[i], i)))
                     )
             );
         }
@@ -52,7 +53,7 @@ public class HeapTupleCodeGenerator extends TupleCodeGenerator {
 
     @Override
     protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl(Class type) throws CompileException {
-        List<Java.SwitchStatement.SwitchBlockStatementGroup> list = Lists.newArrayList();
+        List<Java.SwitchStatement.SwitchBlockStatementGroup> list = new ArrayList<>();
         for (int i = 0; i < fieldTypes.length; i++) {
             if (!type.equals(fieldTypes[i])) {
                 continue;
@@ -60,9 +61,9 @@ public class HeapTupleCodeGenerator extends TupleCodeGenerator {
             list.add(
                     new Java.SwitchStatement.SwitchBlockStatementGroup(
                             loc,
-                            Lists.<Java.Rvalue>newArrayList(new Java.IntegerLiteral(loc, String.valueOf(i + 1))),
+                            Collections.singletonList(new Java.IntegerLiteral(loc, String.valueOf(i + 1))),
                             false,
-                            Lists.<Java.BlockStatement>newArrayList(new Java.ReturnStatement(loc, generateGetInvocation(fieldTypes[i], i)))
+                            Collections.singletonList(new Java.ReturnStatement(loc, generateGetInvocation(fieldTypes[i], i)))
                     )
             );
         }
@@ -72,14 +73,14 @@ public class HeapTupleCodeGenerator extends TupleCodeGenerator {
 
     @Override
     protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value) throws CompileException {
-        List<Java.SwitchStatement.SwitchBlockStatementGroup> list = Lists.newArrayList();
+        List<Java.SwitchStatement.SwitchBlockStatementGroup> list = new ArrayList<>();
         for (int i = 0; i < fieldTypes.length; i++) {
             list.add(
                     new Java.SwitchStatement.SwitchBlockStatementGroup(
                             loc,
-                            Lists.<Java.Rvalue>newArrayList(new Java.IntegerLiteral(loc, String.valueOf(i + 1))),
+                            Collections.singletonList(new Java.IntegerLiteral(loc, String.valueOf(i + 1))),
                             false,
-                            Lists.<Java.BlockStatement>newArrayList(
+                            List.of(
                                     new Java.ExpressionStatement(generateSetInvocation(fieldTypes[i], i, value)),
                                     new Java.BreakStatement(loc, null)
                             )
@@ -92,7 +93,7 @@ public class HeapTupleCodeGenerator extends TupleCodeGenerator {
 
     @Override
     protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value, Class type) throws CompileException {
-        List<Java.SwitchStatement.SwitchBlockStatementGroup> list = Lists.newArrayList();
+        List<Java.SwitchStatement.SwitchBlockStatementGroup> list = new ArrayList<>();
         for (int i = 0; i < fieldTypes.length; i++) {
             if (!type.equals(fieldTypes[i])) {
                 continue;
@@ -100,9 +101,9 @@ public class HeapTupleCodeGenerator extends TupleCodeGenerator {
             list.add(
                     new Java.SwitchStatement.SwitchBlockStatementGroup(
                             loc,
-                            Lists.<Java.Rvalue>newArrayList(new Java.IntegerLiteral(loc, String.valueOf(i + 1))),
+                            Collections.singletonList(new Java.IntegerLiteral(loc, String.valueOf(i + 1))),
                             false,
-                            Lists.<Java.BlockStatement>newArrayList(
+                            List.of(
                                     new Java.ExpressionStatement(generateSetInvocation(fieldTypes[i], i, value)),
                                     new Java.BreakStatement(loc, null)
                             )
