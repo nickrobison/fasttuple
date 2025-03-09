@@ -1,3 +1,5 @@
+import net.researchgate.release.ReleaseExtension
+
 plugins {
     `java-library`
     signing
@@ -19,6 +21,7 @@ allprojects {
     apply(plugin = "java-library")
     apply(plugin = "jacoco")
     apply(plugin = "maven-publish")
+    apply(plugin = "net.researchgate.release")
 
     repositories {
         mavenCentral()
@@ -118,6 +121,12 @@ allprojects {
         useGpgCmd()
         if (isRequired) {
             sign(publishing.publications["mavenJava"])
+        }
+    }
+
+    configure<ReleaseExtension> {
+        with(git) {
+            requireBranch = "master"
         }
     }
 }
