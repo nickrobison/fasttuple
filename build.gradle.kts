@@ -14,14 +14,10 @@ val janinoVersion by extra("3.1.0")
 
 allprojects {
     description = "FastTuple is a library for generating heterogeneous tuples of primitive types from a runtime defined schema without boxing."
-    val isRelease = !version.toString().endsWith("SNAPSHOT")
 
-    apply(plugin = "signing")
     apply(plugin = "org.sonarqube")
     apply(plugin = "java-library")
     apply(plugin = "jacoco")
-    apply(plugin = "maven-publish")
-    apply(plugin = "net.researchgate.release")
 
     repositories {
         mavenCentral()
@@ -54,7 +50,13 @@ allprojects {
             property("sonar.host.url", "https://sonarcloud.io")
         }
     }
+}
 
+configure(project.subprojects.filterNot { it.name == "fasttuple-core" }) {
+    apply(plugin = "maven-publish")
+    apply(plugin = "net.researchgate.release")
+    apply(plugin = "signing")
+    val isRelease = !version.toString().endsWith("SNAPSHOT")
     publishing {
         publications {
             create<MavenPublication>("mavenJava") {
