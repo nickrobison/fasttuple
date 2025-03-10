@@ -1,16 +1,17 @@
-import net.researchgate.release.ReleaseExtension
+import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
-    `java-library`
-    signing
-    `maven-publish`
+    java
     jacoco
     id("org.sonarqube") version "6.0.1.5171"
-    id("info.solidsoft.pitest") version "1.15.0" apply (false)
-    id("net.researchgate.release") version "3.1.0"
+    id("info.solidsoft.pitest") version "1.15.0" apply(false)
+    id("net.researchgate.release") version "3.1.0" apply(false)
+    id("net.ltgt.errorprone") version "4.1.0"
+    id("com.gradleup.shadow") version "8.3.5" apply(false)
 }
 
 val janinoVersion by extra("3.1.0")
+val errorProneVersion by extra("2.31.0")
 
 allprojects {
     description = "FastTuple is a library for generating heterogeneous tuples of primitive types from a runtime defined schema without boxing."
@@ -18,9 +19,15 @@ allprojects {
     apply(plugin = "org.sonarqube")
     apply(plugin = "java-library")
     apply(plugin = "jacoco")
+    apply(plugin = "net.ltgt.errorprone")
 
     repositories {
         mavenCentral()
+    }
+
+    dependencies {
+        errorprone("com.google.errorprone:error_prone_core:${errorProneVersion}")
+
     }
 
     java {
@@ -28,6 +35,11 @@ allprojects {
         targetCompatibility = JavaVersion.VERSION_11
         withJavadocJar()
         withSourcesJar()
+    }
+
+    tasks.withType<JavaCompile>().configureEach {
+        options.errorprone.disableWarningsInGeneratedCode = true
+
     }
 
     tasks.jacocoTestReport {
@@ -41,88 +53,6 @@ allprojects {
             property("sonar.projectKey", "nickrobison_fasttuple")
             property("sonar.organization", "nickrobison-github")
             property("sonar.host.url", "https://sonarcloud.io")
-        }
-    }
-}
-
-configure(project.subprojects.filterNot { it.name == "fasttuple-core" }) {
-    apply(plugin = "maven-publish")
-    apply(plugin = "net.researchgate.release")
-    apply(plugin = "signing")
-    val isRelease = !version.toString().endsWith("SNAPSHOT")
-    publishing {
-        publications {
-            create<MavenPublication>("mavenJava") {
-                pom {
-                    name.set(project.name)
-                    description.set(project.description)
-                    url.set("https://github.com/nickrobison/fasttuple")
-
-                    licenses {
-                        license {
-                            name.set("The Apache License, Version 2.0")
-                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                        }
-                    }
-
-                    scm {
-                        scm {
-                            connection.set("git@github.com:nickrobison/fasttuple.git")
-                            developerConnection.set("git@github.com:nickrobison/fasttuple.git")
-                            url.set("https://github.com:nickrobison/fasttuple")
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id.set("nick")
-                            name.set("Nick Robison")
-                            email.set("nick@nickrobison.com")
-                        }
-                        developer {
-                            id.set("cliff")
-                            name.set("Cliff Moon")
-                            email.set("cliff@boundary.com")
-                        }
-                        developer {
-                            id.set("philip")
-                            name.set("Philip Warren")
-                            email.set("philip@boundary.com")
-                        }
-                    }
-                }
-                from(components["java"])
-            }
-        }
-
-        repositories {
-            maven {
-                credentials {
-                    val sonatypeUsername: String? by project
-                    val sonatypePassword: String? by project
-                    username = sonatypeUsername ?: System.getenv("MAVEN_USER")
-                    password = sonatypePassword ?: System.getenv("MAVEN_PASSWORD")
-                }
-                val releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-                val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
-                url = uri(if (isRelease) releasesRepoUrl else snapshotsRepoUrl)
-                name = "maven-central"
-            }
-        }
-    }
-
-    signing {
-        isRequired = isRelease
-        useGpgCmd()
-        if (isRequired) {
-            sign(publishing.publications["mavenJava"])
-        }
-    }
-
-    configure<ReleaseExtension> {
-        with(git) {
-            requireBranch = "master"
-            signTag = true
         }
     }
 }

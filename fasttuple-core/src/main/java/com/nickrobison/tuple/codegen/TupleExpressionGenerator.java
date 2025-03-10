@@ -9,6 +9,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.nickrobison.tuple.codegen.CodegenUtil.*;
@@ -57,14 +58,14 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
         boolean evaluate(FastTuple tuple);
     }
 
-    private static String packageName = "com.nickrobison.tuple";
-    private static AtomicLong counter = new AtomicLong(0);
-    private String expression;
-    private TupleSchema schema;
+    private static final String packageName = "com.nickrobison.tuple";
+    private static final AtomicLong counter = new AtomicLong(0);
+    private final String expression;
+    private final TupleSchema schema;
     private Class evaluatorClass;
     private Object evaluator;
-    private Class iface;
-    private Class returnType;
+    private final Class iface;
+    private final Class returnType;
 
     public static Builder builder() {
         return new Builder();
@@ -238,6 +239,19 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
                 },
                 false
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof TupleExpressionGenerator)) return false;
+        if (!super.equals(o)) return false;
+        TupleExpressionGenerator that = (TupleExpressionGenerator) o;
+        return Objects.equals(expression, that.expression) && Objects.equals(schema, that.schema) && Objects.equals(evaluatorClass, that.evaluatorClass) && Objects.equals(evaluator, that.evaluator) && Objects.equals(iface, that.iface) && Objects.equals(returnType, that.returnType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), expression, schema, evaluatorClass, evaluator, iface, returnType);
     }
 
     public Object evaluator() {

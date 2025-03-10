@@ -138,6 +138,7 @@ public class DirectTupleSchema extends TupleSchema {
         return unsafe.allocateMemory(size * byteSize);
     }
 
+    @Override
     public FastTuple createTuple() throws Exception {
         long address = createRecord();
         return createTuple(address);
@@ -153,7 +154,7 @@ public class DirectTupleSchema extends TupleSchema {
         long address = createRecordArray(size);
         FastTuple[] tuples = new FastTuple[size];
         for (int i = 0; i < size; i++) {
-            tuples[i] = createTuple(address + byteSize * i);
+            tuples[i] = createTuple(address + (long) byteSize * i);
         }
         return tuples;
     }
@@ -164,7 +165,7 @@ public class DirectTupleSchema extends TupleSchema {
         @SuppressWarnings("unchecked")
         T[] tuples = (T[]) Array.newInstance(clazz, size);
         for (int i = 0; i < size; i++) {
-            tuples[i] = clazz.cast(createTuple(address + byteSize * i));
+            tuples[i] = clazz.cast(createTuple(address + (long) byteSize * i));
         }
         return tuples;
     }
@@ -203,6 +204,7 @@ public class DirectTupleSchema extends TupleSchema {
         unsafe.freeMemory(address);
     }
 
+    @Override
     protected void generateClass() throws Exception {
         if (this.clazz == null) {
             this.clazz = new DirectTupleCodeGenerator(iface, fieldNames, fieldTypes, layout).cookToClass();
@@ -231,7 +233,7 @@ public class DirectTupleSchema extends TupleSchema {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof DirectTupleSchema)) return false;
         if (!super.equals(o)) return false;
         DirectTupleSchema that = (DirectTupleSchema) o;
         return byteSize == that.byteSize &&

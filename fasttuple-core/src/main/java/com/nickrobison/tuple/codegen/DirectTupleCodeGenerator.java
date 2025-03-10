@@ -21,6 +21,7 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
         this.layout = layout.clone();
     }
 
+    @Override
     protected Java.FieldDeclaration[] generateFields() {
         return new Java.FieldDeclaration[]{
                 new Java.FieldDeclaration(
@@ -120,6 +121,7 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
         return list;
     }
 
+    @Override
     protected Java.Rvalue generateGetInvocation(Class type, int index) throws CompileException {
         return new Java.MethodInvocation(loc,
                 new Java.AmbiguousName(loc, new String[]{"unsafe"}),
@@ -133,6 +135,7 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
         );
     }
 
+    @Override
     protected Java.Rvalue generateSetInvocation(Class type, int index, String value) throws CompileException {
         return new Java.MethodInvocation(loc,
                 new Java.AmbiguousName(loc, new String[]{"unsafe"}),

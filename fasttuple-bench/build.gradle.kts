@@ -1,15 +1,16 @@
+plugins {
+    application
+    id("com.gradleup.shadow")
+}
+
 val jmhVersion = "1.37"
+val objectPoolVersion = "1.1.2"
 
 dependencies {
     implementation(project(":fasttuple-core"))
     implementation("org.openjdk.jmh:jmh-core:$jmhVersion")
-    implementation("nf.fr.eraasoft:objectpool:1.1.2")
+    implementation("nf.fr.eraasoft:objectpool:$objectPoolVersion")
     annotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:$jmhVersion")
-}
-
-plugins {
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    application
 }
 
 application {
