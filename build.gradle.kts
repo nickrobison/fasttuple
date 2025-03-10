@@ -1,3 +1,4 @@
+import net.ltgt.gradle.errorprone.errorprone
 import net.researchgate.release.ReleaseExtension
 
 plugins {
@@ -8,9 +9,11 @@ plugins {
     id("org.sonarqube") version "6.0.1.5171"
     id("info.solidsoft.pitest") version "1.15.0" apply (false)
     id("net.researchgate.release") version "3.1.0"
+    id("net.ltgt.errorprone") version "4.1.0"
 }
 
 val janinoVersion by extra("3.1.0")
+val errorProneVersion by extra("2.36.0")
 
 allprojects {
     description = "FastTuple is a library for generating heterogeneous tuples of primitive types from a runtime defined schema without boxing."
@@ -18,9 +21,15 @@ allprojects {
     apply(plugin = "org.sonarqube")
     apply(plugin = "java-library")
     apply(plugin = "jacoco")
+    apply(plugin = "net.ltgt.errorprone")
 
     repositories {
         mavenCentral()
+    }
+
+    dependencies {
+        errorprone("com.google.errorprone:error_prone_core:${errorProneVersion}")
+
     }
 
     java {
@@ -28,6 +37,11 @@ allprojects {
         targetCompatibility = JavaVersion.VERSION_11
         withJavadocJar()
         withSourcesJar()
+    }
+
+    tasks.withType<JavaCompile>().configureEach {
+        options.errorprone.disableWarningsInGeneratedCode = true
+
     }
 
     tasks.jacocoTestReport {
