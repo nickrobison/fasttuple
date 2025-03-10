@@ -1,5 +1,4 @@
 import net.ltgt.gradle.errorprone.errorprone
-import net.researchgate.release.ReleaseExtension
 
 plugins {
     java
