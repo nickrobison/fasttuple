@@ -1,8 +1,9 @@
 package com.nickrobison.tuple.codegen;
 
-import com.google.common.collect.Lists;
 import org.codehaus.commons.compiler.Location;
 import org.codehaus.janino.Java;
+
+import java.util.Collections;
 
 /**
  * Created by cliff on 5/14/14.
@@ -27,7 +28,7 @@ public final class CodegenUtil {
                 ),
                 new Java.Type[0],
                 null,
-                Lists.newArrayList()
+                Collections.emptyList()
         );
     }
 

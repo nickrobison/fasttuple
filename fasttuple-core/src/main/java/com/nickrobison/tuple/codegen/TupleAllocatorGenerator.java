@@ -1,10 +1,11 @@
 package com.nickrobison.tuple.codegen;
 
 import com.nickrobison.tuple.FastTuple;
-import com.google.common.collect.Lists;
 import org.codehaus.commons.compiler.Location;
 import org.codehaus.janino.ClassBodyEvaluator;
 import org.codehaus.janino.Java;
+
+import java.util.Collections;
 
 import static com.nickrobison.tuple.codegen.CodegenUtil.*;
 
@@ -58,7 +59,7 @@ public class TupleAllocatorGenerator extends ClassBodyEvaluator {
                 emptyParams(loc),
                 new Java.Type[0],
                 null,
-                Lists.<Java.BlockStatement>newArrayList(
+                Collections.singletonList(
                         new Java.ReturnStatement(loc,
                                 new Java.NewClassInstance(
                                         loc,

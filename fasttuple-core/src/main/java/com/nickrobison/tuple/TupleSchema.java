@@ -1,7 +1,5 @@
 package com.nickrobison.tuple;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,18 +21,21 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
     }
 
     protected TupleSchema(Builder builder) {
-        this.fieldNames = builder.fn.toArray(new String[builder.fn.size()]);
-        this.fieldTypes = builder.ft.toArray(new Class[builder.ft.size()]);
-        Preconditions.checkArgument(fieldNames.length == fieldTypes.length,
-                "fieldNames and fieldTypes must have equal length");
+        this.fieldNames = builder.fn.toArray(new String[0]);
+        this.fieldTypes = builder.ft.toArray(new Class[0]);
+        if (fieldNames.length != fieldTypes.length) {
+            throw new IllegalArgumentException("fieldNames and fieldTypes must have equal length");
+        }
         for (int i = 0; i < fieldNames.length; i++) {
-            Preconditions.checkArgument(fieldTypes[i].isPrimitive() && !fieldTypes[i].equals(Boolean.TYPE));
+            if (!fieldTypes[i].isPrimitive() && !fieldTypes[i].equals(Boolean.TYPE)) {
+                throw new IllegalArgumentException("Invalid field type combination");
+            }
         }
         this.iface = builder.iface;
-        if (iface != null) {
-            Preconditions.checkArgument(iface.isInterface(),
-                    iface.getName() +  " is not an interface");
-        }
+        if (iface != null && !iface.isInterface()) {
+                throw new IllegalArgumentException(iface.getName() +  " is not an interface");
+            }
+
         this.pool = new TuplePool<>(builder.poolSize, builder.createWhenExhausted, this, this);
 
     }
@@ -57,8 +58,8 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
         }
 
         public Builder() {
-            fn = Lists.newArrayList();
-            ft = Lists.newArrayList();
+            fn = new ArrayList<>();
+            ft = new ArrayList<>();
             iface = null;
             poolSize = 0;
             threads = 0;

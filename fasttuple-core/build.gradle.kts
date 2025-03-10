@@ -1,6 +1,7 @@
 val junitVersion = "5.12.0"
 
 dependencies {
+    api("org.codehaus.janino:janino:${rootProject.ext.get("janinoVersion")}")
     implementation("org.codehaus.janino:commons-compiler:${rootProject.ext.get("janinoVersion")}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
