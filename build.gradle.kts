@@ -12,7 +12,7 @@ plugins {
 }
 
 val janinoVersion by extra("3.1.0")
-val errorProneVersion by extra("2.36.0")
+val errorProneVersion by extra("2.31.0")
 
 allprojects {
     description = "FastTuple is a library for generating heterogeneous tuples of primitive types from a runtime defined schema without boxing."
