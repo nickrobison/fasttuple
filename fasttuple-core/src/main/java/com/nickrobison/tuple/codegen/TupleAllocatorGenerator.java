@@ -19,9 +19,9 @@ public class TupleAllocatorGenerator extends ClassBodyEvaluator {
         FastTuple allocate();
     }
 
-    private final Class allocatorClass;
+    private final Class<?> allocatorClass;
 
-    public TupleAllocatorGenerator(Class tupleClass) throws Exception {
+    public TupleAllocatorGenerator(Class<?> tupleClass) throws Exception {
         setParentClassLoader(tupleClass.getClassLoader());
         String className = tupleClass.getName() + "Allocator";
         setClassName(packageName + "." + className);
@@ -36,7 +36,7 @@ public class TupleAllocatorGenerator extends ClassBodyEvaluator {
         return (TupleAllocator) allocatorClass.getConstructor().newInstance();
     }
 
-    private Java.PackageMemberClassDeclaration makeClassDefinition(Location loc, Class tupleClass, String className) {
+    private Java.PackageMemberClassDeclaration makeClassDefinition(Location loc, Class <?>tupleClass, String className) {
         Java.PackageMemberClassDeclaration cd = new Java.PackageMemberClassDeclaration(
                 loc,
                 null,

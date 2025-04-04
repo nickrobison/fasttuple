@@ -11,9 +11,9 @@ import java.util.List;
  */
 public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTuple> {
     protected final String[] fieldNames;
-    protected final Class[] fieldTypes;
-    protected final Class iface;
-    protected Class clazz;
+    protected final Class<?>[] fieldTypes;
+    protected final Class<?> iface;
+    protected Class<?> clazz;
     protected final TuplePool<FastTuple> pool;
 
     public static Builder builder() {
@@ -33,19 +33,19 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
         }
         this.iface = builder.iface;
         if (iface != null && !iface.isInterface()) {
-                throw new IllegalArgumentException(iface.getName() +  " is not an interface");
-            }
+            throw new IllegalArgumentException(iface.getName() + " is not an interface");
+        }
 
         this.pool = new TuplePool<>(builder.poolSize, builder.createWhenExhausted, this, this);
 
     }
 
     public static class Builder {
-        private List<String> fn;
-        private List<Class> ft;
-        private Class iface;
+        private final List<String> fn;
+        private final List<Class<?>> ft;
+        private Class<?> iface;
         private int poolSize;
-        private int threads;
+        private final int threads;
         private boolean createWhenExhausted = false;
 
         public Builder(Builder builder) {
@@ -74,7 +74,7 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
          * @param fieldType - {@link Class} type of field
          * @return - {@link Builder}
          */
-        public Builder addField(String fieldName, Class fieldType) {
+        public Builder addField(String fieldName, Class<?> fieldType) {
             fn.add(fieldName);
             ft.add(fieldType);
             return this;
@@ -87,7 +87,7 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
          * @param iface - {@link Class} interface to implement
          * @return - {@link Builder}
          */
-        public Builder implementInterface(Class iface) {
+        public Builder implementInterface(Class<?> iface) {
             this.iface = iface;
             return this;
         }
@@ -104,13 +104,13 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
             return this;
         }
 
-        public Builder addFieldTypes(Class... fieldTypes) {
+        public Builder addFieldTypes(Class<?>... fieldTypes) {
             Collections.addAll(ft, fieldTypes);
             return this;
         }
 
-        public Builder addFieldTypes(Iterable<Class> fieldTypes) {
-            for (Class c : fieldTypes) {
+        public Builder addFieldTypes(Iterable<Class<?>> fieldTypes) {
+            for (Class<?> c : fieldTypes) {
                 ft.add(c);
             }
             return this;
@@ -163,7 +163,7 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder("(");
-        for (int i=0; i<fieldNames.length; i++) {
+        for (int i = 0; i < fieldNames.length; i++) {
             str.append("'");
             str.append(fieldNames[i]);
             str.append("':");
@@ -188,10 +188,10 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(new Object[] {fieldNames, fieldTypes});
+        return Arrays.deepHashCode(new Object[]{fieldNames, fieldTypes});
     }
 
-    public Class tupleClass() {
+    public Class<?> tupleClass() {
         return clazz;
     }
 
@@ -199,8 +199,25 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
         return fieldNames.clone();
     }
 
-    public Class[] getFieldTypes() {
+    public Class<?>[] getFieldTypes() {
         return fieldTypes.clone();
+    }
+
+    /**
+     * Retrieves the index of a field by its name. The index is 1-based, meaning the first field is index 1.
+     *
+     * @param name the name of the field to find
+     * @return the 1-based index of the field
+     * @throws IllegalArgumentException if the field name is not found in the schema
+     */
+    public int getFieldIndex(String name) {
+        final String[] cloned = fieldNames.clone();
+        for (int i = 0; i < cloned.length; i++) {
+            if (cloned[i].equals(name)) {
+                return i + 1;
+            }
+        }
+        throw new IllegalArgumentException("Field " + name + " not found");
     }
 
     protected abstract void generateClass() throws Exception;
@@ -218,7 +235,7 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
      * Use care to call {@link Builder#implementInterface(Class)} before using this method
      *
      * @param clazz - {@link Class} implemented by the Tuple
-     * @param <T> - {@link T} type parameter
+     * @param <T>   - {@link T} type parameter
      * @return - {@link FastTuple} case to type {@link T}
      * @throws Exception - Throws an exception if unable to allocate tuple or cast to the specified type
      */
@@ -239,8 +256,8 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
      * in adjacent memory, however with the heap based allocation this is not guaranteed.
      *
      * @param clazz - {@link Class} implemented by the Tuple
-     * @param size - the number of tuples in the array
-     * @param <T> - {@link T} type parameter
+     * @param size  - the number of tuples in the array
+     * @param <T>   - {@link T} type parameter
      * @return - Array of {@link FastTuple} cast to type {@link T}
      * @throws Exception - Throws is unable to allocate tuple array or cast to the specified type
      */
@@ -254,10 +271,10 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
     public abstract void destroyTuple(FastTuple tuple);
 
     /**
-     ** Deallocates memory for a typed tuple.
+     * * Deallocates memory for a typed tuple.
      *
      * @param tuple - {@link FastTuple} cast to type {@link T}
-     * @param <T> - {@link T} underlying class implemented by tuples
+     * @param <T>   - {@link T} underlying class implemented by tuples
      */
     public abstract <T> void destroyTypedTuple(T tuple);
 

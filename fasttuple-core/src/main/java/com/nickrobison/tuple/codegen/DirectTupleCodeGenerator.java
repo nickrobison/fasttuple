@@ -14,9 +14,9 @@ import static com.nickrobison.tuple.codegen.CodegenUtil.PUBLIC;
  * Created by cliff on 5/5/14.
  */
 public class DirectTupleCodeGenerator extends TupleCodeGenerator {
-    protected int[] layout;
+    protected final int[] layout;
 
-    public DirectTupleCodeGenerator(Class iface, String[] fieldNames, Class[] fieldTypes, int[] layout) {
+    public DirectTupleCodeGenerator(Class<?> iface, String[] fieldNames, Class<?>[] fieldTypes, int[] layout) {
         super(iface, fieldNames, fieldTypes);
         this.layout = layout.clone();
     }
@@ -47,7 +47,7 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
     }
 
     @Override
-    protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl() throws CompileException {
+    protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl() {
         List<Java.SwitchStatement.SwitchBlockStatementGroup> list = new ArrayList<>();
         for (int i = 0; i < fieldNames.length; i++) {
             list.add(
@@ -64,7 +64,7 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
     }
 
     @Override
-    protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl(Class type) throws CompileException {
+    protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl(Class<?> type) {
         List<Java.SwitchStatement.SwitchBlockStatementGroup> list = new ArrayList<>();
         for (int n = 0; n < fieldNames.length; n++) {
             if (!type.equals(fieldTypes[n])) {
@@ -102,7 +102,7 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
     }
 
     @Override
-    protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value, Class type) throws CompileException {
+    protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value, Class<?> type) throws CompileException {
         List<Java.SwitchStatement.SwitchBlockStatementGroup> list = new ArrayList<>();
         for (int n = 0; n < fieldNames.length; n++) {
             if (!type.equals(fieldTypes[n])) {
@@ -122,7 +122,7 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
     }
 
     @Override
-    protected Java.Rvalue generateGetInvocation(Class type, int index) throws CompileException {
+    protected Java.Rvalue generateGetInvocation(Class<?> type, int index) {
         return new Java.MethodInvocation(loc,
                 new Java.AmbiguousName(loc, new String[]{"unsafe"}),
                 "get" + accessorForType(type),
@@ -136,7 +136,7 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
     }
 
     @Override
-    protected Java.Rvalue generateSetInvocation(Class type, int index, String value) throws CompileException {
+    protected Java.Rvalue generateSetInvocation(Class<?> type, int index, String value) {
         return new Java.MethodInvocation(loc,
                 new Java.AmbiguousName(loc, new String[]{"unsafe"}),
                 "put" + accessorForType(type),
@@ -150,7 +150,7 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
         );
     }
 
-    protected String accessorForType(Class type) {
+    protected String accessorForType(Class<?> type) {
         if (type.equals(Byte.TYPE)) {
             return "Byte";
         } else if (type.equals(Character.TYPE)) {

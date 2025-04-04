@@ -16,7 +16,7 @@ public class SchemaBuilderTests {
     void testNonInterface() {
 
         final List<String> nameList = Arrays.asList("a", "b", "c");
-        final List<Class> typeList = Arrays.asList(Long.TYPE, Long.TYPE, Long.TYPE);
+        final List<Class<?>> typeList = Arrays.asList(Long.TYPE, Long.TYPE, Long.TYPE);
         final IllegalArgumentException exn = assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder().
                 addFieldNames(nameList).
                 addFieldTypes(typeList).
@@ -32,8 +32,8 @@ public class SchemaBuilderTests {
         final IllegalArgumentException exn = assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder()
                 .addFieldNames("Test", "Field")
                 .addFieldTypes(String.class).
-                        heapMemory().
-                        build());
+                heapMemory().
+                build());
 
         assertEquals("fieldNames and fieldTypes must have equal length", exn.getLocalizedMessage());
     }
@@ -43,14 +43,14 @@ public class SchemaBuilderTests {
         assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder()
                 .addFieldNames("Test", "Field")
                 .addFieldTypes(String.class, Integer.class).
-                        heapMemory().
-                        build());
+                heapMemory().
+                build());
 
         assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder()
                 .addFieldNames("Test", "Field")
                 .addFieldTypes(Boolean.class, Integer.class).
-                        heapMemory().
-                        build());
+                heapMemory().
+                build());
     }
 
     @Test
@@ -83,12 +83,19 @@ public class SchemaBuilderTests {
                 addField("d", Integer.TYPE).
                 heapMemory().
                 build();
+        //noinspection EqualsWithItself
         assertEquals(schema, schema);
         //noinspection RedundantCast - Suppress this because we need to test the equals method
-        assertNotEquals((Object) schema, (Object) "I'm a string");
+        assertNotEquals((Object) "I'm a string", (Object) schema);
         assertNotEquals(schema, s2);
         assertEquals("('a':long,'b':long,'c':long)", schema.toString());
         assertEquals(schema.hashCode(), schema.hashCode());
         assertNotEquals(schema.hashCode(), s2.hashCode());
+
+        final int aIdx = schema.getFieldIndex("a");
+        assertEquals(1, aIdx);
+        final FastTuple tuple = schema.createTuple();
+        tuple.setLong(aIdx, 123456789L);
+        assertThrows(IllegalArgumentException.class, () -> schema.getFieldIndex("nope"));
     }
 }
