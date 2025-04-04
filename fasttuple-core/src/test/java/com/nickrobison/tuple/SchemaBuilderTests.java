@@ -32,8 +32,8 @@ public class SchemaBuilderTests {
         final IllegalArgumentException exn = assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder()
                 .addFieldNames("Test", "Field")
                 .addFieldTypes(String.class).
-                        heapMemory().
-                        build());
+                heapMemory().
+                build());
 
         assertEquals("fieldNames and fieldTypes must have equal length", exn.getLocalizedMessage());
     }
@@ -43,14 +43,14 @@ public class SchemaBuilderTests {
         assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder()
                 .addFieldNames("Test", "Field")
                 .addFieldTypes(String.class, Integer.class).
-                        heapMemory().
-                        build());
+                heapMemory().
+                build());
 
         assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder()
                 .addFieldNames("Test", "Field")
                 .addFieldTypes(Boolean.class, Integer.class).
-                        heapMemory().
-                        build());
+                heapMemory().
+                build());
     }
 
     @Test
@@ -90,5 +90,11 @@ public class SchemaBuilderTests {
         assertEquals("('a':long,'b':long,'c':long)", schema.toString());
         assertEquals(schema.hashCode(), schema.hashCode());
         assertNotEquals(schema.hashCode(), s2.hashCode());
+
+        final int aIdx = schema.getFieldIndex("a");
+        assertEquals(1, aIdx);
+        final FastTuple tuple = schema.createTuple();
+        tuple.setLong(aIdx, 123456789L);
+        assertThrows(IllegalArgumentException.class, () -> schema.getFieldIndex("nope"));
     }
 }
