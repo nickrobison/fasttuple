@@ -18,8 +18,11 @@ dependencies {
 }
 
 configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
-    junit5PluginVersion.set("0.12")
+    pitestVersion = "1.19.0"
+    junit5PluginVersion = "1.2.2"
+    threads = 4
     targetClasses.add("com.nickrobison.tuple.*")
+    outputFormats.add("HTML")
 }
 
 tasks.test {
