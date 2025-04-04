@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class HeapTupleCodeGenerator extends TupleCodeGenerator {
 
-    public HeapTupleCodeGenerator(Class iface, String[] fieldName, Class[] fieldType) {
+    public HeapTupleCodeGenerator(Class<?>iface, String[] fieldName, Class<?>[] fieldType) {
         super(iface, fieldName, fieldType);
     }
 
@@ -35,7 +35,7 @@ public class HeapTupleCodeGenerator extends TupleCodeGenerator {
     }
 
     @Override
-    protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl() throws CompileException {
+    protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl() {
         List<Java.SwitchStatement.SwitchBlockStatementGroup> list = new ArrayList<>();
         for (int i = 0; i < fieldTypes.length; i++) {
             list.add(
@@ -52,7 +52,7 @@ public class HeapTupleCodeGenerator extends TupleCodeGenerator {
     }
 
     @Override
-    protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl(Class type) throws CompileException {
+    protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl(Class<?> type) {
         List<Java.SwitchStatement.SwitchBlockStatementGroup> list = new ArrayList<>();
         for (int i = 0; i < fieldTypes.length; i++) {
             if (!type.equals(fieldTypes[i])) {
@@ -92,7 +92,7 @@ public class HeapTupleCodeGenerator extends TupleCodeGenerator {
     }
 
     @Override
-    protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value, Class type) throws CompileException {
+    protected List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value, Class<?> type) throws CompileException {
         List<Java.SwitchStatement.SwitchBlockStatementGroup> list = new ArrayList<>();
         for (int i = 0; i < fieldTypes.length; i++) {
             if (!type.equals(fieldTypes[i])) {
@@ -115,12 +115,12 @@ public class HeapTupleCodeGenerator extends TupleCodeGenerator {
     }
 
     @Override
-    protected Java.Rvalue generateGetInvocation(Class type, int index) throws CompileException {
+    protected Java.Rvalue generateGetInvocation(Class<?> type, int index) {
         return new Java.FieldAccessExpression(loc, new Java.ThisReference(loc), fieldNames[index]);
     }
 
     @Override
-    protected Java.Rvalue generateSetInvocation(Class type, int index, String value) throws CompileException {
+    protected Java.Rvalue generateSetInvocation(Class<?> type, int index, String value) {
         return new Java.Assignment(loc, new Java.FieldAccessExpression(loc, new Java.ThisReference(loc), fieldNames[index]), "=",
                 new Java.Cast(loc, classToRefType(fieldTypes[index]), new Java.AmbiguousName(loc, new String[]{value})));
     }

@@ -62,10 +62,10 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
     private static final AtomicLong counter = new AtomicLong(0);
     private final String expression;
     private final TupleSchema schema;
-    private Class evaluatorClass;
+    private Class<?> evaluatorClass;
     private Object evaluator;
-    private final Class iface;
-    private final Class returnType;
+    private final Class<?> iface;
+    private final Class<?> returnType;
 
     public static Builder builder() {
         return new Builder();
@@ -129,7 +129,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
 
     }
 
-    private TupleExpressionGenerator(TupleSchema schema, String expression, Class iface, Class returnType) throws Exception {
+    private TupleExpressionGenerator(TupleSchema schema, String expression, Class<?> iface, Class<?> returnType) throws Exception {
         this.schema = schema;
         this.expression = expression;
         this.iface = iface;
@@ -226,7 +226,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
         }
     }
 
-    private Java.FunctionDeclarator.FormalParameters generateArgs(Location loc, Class c) {
+    private Java.FunctionDeclarator.FormalParameters generateArgs(Location loc, Class<?> c) {
         return new Java.FunctionDeclarator.FormalParameters(
                 loc,
                 new Java.FunctionDeclarator.FormalParameter[] {

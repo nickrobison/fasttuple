@@ -7,7 +7,7 @@ public final class SizeOf {
 
     private SizeOf() {}
 
-    public static int sizeOf(Class c) {
+    public static int sizeOf(Class<?> c) {
         if (c.equals(Byte.TYPE)) {
             return 1;
         } else if (c.equals(Short.TYPE) || c.equals(Character.TYPE)) {

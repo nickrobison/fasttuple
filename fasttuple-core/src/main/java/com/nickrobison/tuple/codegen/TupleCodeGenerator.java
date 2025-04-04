@@ -21,8 +21,8 @@ import static java.lang.Character.toUpperCase;
 public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
     public static final String VALUE = "value";
     public static final String INDEX = "index";
-    private static AtomicLong counter = new AtomicLong(0L);
-    protected static Class[] types = new Class[]{
+    private static final AtomicLong counter = new AtomicLong(0L);
+    protected static final Class<?>[] types = new Class[]{
             Long.TYPE,
             Integer.TYPE,
             Short.TYPE,
@@ -31,13 +31,13 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
             Float.TYPE,
             Double.TYPE
     };
-    protected Class iface;
-    protected String[] fieldNames;
-    protected Class[] fieldTypes;
-    protected Location loc;
-    protected String className;
+    protected final Class<?> iface;
+    protected final String[] fieldNames;
+    protected final Class<?>[] fieldTypes;
+    protected final Location loc;
+    protected final String className;
 
-    protected TupleCodeGenerator(Class iface, String[] fieldNames, Class[] fieldTypes) {
+    protected TupleCodeGenerator(Class<?> iface, String[] fieldNames, Class<?>[] fieldTypes) {
         this.loc = new Location("", (short) 0, (short) 0);
         this.iface = iface;
         this.fieldNames = fieldNames.clone();
@@ -49,7 +49,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
 
     protected abstract Java.FieldDeclaration[] generateFields();
 
-    public Class cookToClass() throws CompileException {
+    public Class<?> cookToClass() throws CompileException {
         return compileToClass(makeCompilationUnit());
     }
 
@@ -57,7 +57,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         Java.CompilationUnit cu = new Java.CompilationUnit(null, new SingleTypeImportDeclaration[]{new SingleTypeImportDeclaration(loc, "com.nickrobison.tuple.unsafe.Coterie".split("\\."))});
         Location cuLoc = new Location("", ((short) 0), ((short) 0));
         cu.setPackageDeclaration(new Java.PackageDeclaration(cuLoc, "com.nickrobison.tuple"));
-        Class[] ifaces;
+        Class<?>[] ifaces;
         if (iface != null) {
             ifaces = new Class[]{iface};
         } else {
@@ -81,7 +81,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
 
         for (int i = 0; i < fieldNames.length; i++) {
             String name = fieldNames[i];
-            Class type = fieldTypes[i];
+            Class<?> type = fieldTypes[i];
 
 
             cd.addDeclaredMethod(generateGetter(name, type, i));
@@ -98,7 +98,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         return cu;
     }
 
-    protected Java.MethodDeclarator generateIndexedGetter() throws CompileException {
+    protected Java.MethodDeclarator generateIndexedGetter() {
         return new Java.MethodDeclarator(
                 loc,
                 null,
@@ -116,9 +116,9 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         );
     }
 
-    protected List<Java.MethodDeclarator> generateIndexedTypedGetters() throws CompileException {
+    protected List<Java.MethodDeclarator> generateIndexedTypedGetters() {
         List<Java.MethodDeclarator> methods = new ArrayList<>();
-        for (Class type : types) {
+        for (Class<?> type : types) {
             methods.add(new Java.MethodDeclarator(
                     loc,
                     null,
@@ -140,7 +140,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
 
     protected List<Java.MethodDeclarator> generateIndexedTypedSetters() throws CompileException {
         List<Java.MethodDeclarator> methods = new ArrayList<>();
-        for (Class type : types) {
+        for (Class<?> type : types) {
             methods.add(new Java.MethodDeclarator(
                     loc,
                     null,
@@ -182,15 +182,15 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         );
     }
 
-    protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl() throws CompileException;
+    protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl();
 
-    protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl(Class type) throws CompileException;
+    protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl(Class<?> type);
 
     protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value) throws CompileException;
 
-    protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value, Class type) throws CompileException;
+    protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value, Class<?> type) throws CompileException;
 
-    protected Java.MethodDeclarator generateGetter(String name, Class type, int index) throws CompileException {
+    protected Java.MethodDeclarator generateGetter(String name, Class<?> type, int index) {
         // unsafe().get* (long)
         Java.BlockStatement st = new Java.ReturnStatement(loc, generateGetInvocation(type, index));
         return new Java.MethodDeclarator(
@@ -207,7 +207,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         );
     }
 
-    protected Java.MethodDeclarator generateSetter(String name, Class type, int index) throws CompileException {
+    protected Java.MethodDeclarator generateSetter(String name, Class<?> type, int index) throws CompileException {
         Java.BlockStatement st = new Java.ExpressionStatement(generateSetInvocation(type, index, VALUE));
         return new Java.MethodDeclarator(
                 loc,
@@ -225,16 +225,16 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         );
     }
 
-    protected abstract Java.Rvalue generateGetInvocation(Class type, int index) throws CompileException;
+    protected abstract Java.Rvalue generateGetInvocation(Class<?> type, int index);
 
-    protected abstract Java.Rvalue generateSetInvocation(Class type, int index, String value) throws CompileException;
+    protected abstract Java.Rvalue generateSetInvocation(Class<?> type, int index, String value);
 
     protected String capitalize(String st) {
         return toUpperCase(st.charAt(0)) + st.substring(1);
     }
 
 
-    protected Java.Primitive primIndex(Class type) {
+    protected Java.Primitive primIndex(Class<?> type) {
         if (type.equals(Long.TYPE)) return Java.Primitive.LONG;
         if (type.equals(Integer.TYPE)) return Java.Primitive.INT;
         if (type.equals(Short.TYPE)) return Java.Primitive.SHORT;
@@ -245,7 +245,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         return Java.Primitive.VOID;
     }
 
-    protected String primToBox(Class type) {
+    protected String primToBox(Class<?> type) {
         if (type.equals(Long.TYPE)) return "Long";
         if (type.equals(Integer.TYPE)) return "Integer";
         if (type.equals(Short.TYPE)) return "Short";
@@ -272,7 +272,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                 ));
     }
 
-    protected Java.Type classToRefType(Class type) {
+    protected Java.Type classToRefType(Class<?> type) {
         if (type.isPrimitive()) {
             return new Java.ReferenceType(loc, new Java.NormalAnnotation[]{}, primToBox(type).split("\\."), null);
         } else {
