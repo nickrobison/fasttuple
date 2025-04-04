@@ -11,9 +11,9 @@ import java.util.List;
  */
 public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTuple> {
     protected final String[] fieldNames;
-    protected final Class[] fieldTypes;
-    protected final Class iface;
-    protected Class clazz;
+    protected final Class<?>[] fieldTypes;
+    protected final Class<?> iface;
+    protected Class<?> clazz;
     protected final TuplePool<FastTuple> pool;
 
     public static Builder builder() {
@@ -41,11 +41,11 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
     }
 
     public static class Builder {
-        private List<String> fn;
-        private List<Class> ft;
-        private Class iface;
+        private final List<String> fn;
+        private final List<Class<?>> ft;
+        private Class<?> iface;
         private int poolSize;
-        private int threads;
+        private final int threads;
         private boolean createWhenExhausted = false;
 
         public Builder(Builder builder) {
@@ -74,7 +74,7 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
          * @param fieldType - {@link Class} type of field
          * @return - {@link Builder}
          */
-        public Builder addField(String fieldName, Class fieldType) {
+        public Builder addField(String fieldName, Class<?> fieldType) {
             fn.add(fieldName);
             ft.add(fieldType);
             return this;
@@ -87,7 +87,7 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
          * @param iface - {@link Class} interface to implement
          * @return - {@link Builder}
          */
-        public Builder implementInterface(Class iface) {
+        public Builder implementInterface(Class<?> iface) {
             this.iface = iface;
             return this;
         }
@@ -104,13 +104,13 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
             return this;
         }
 
-        public Builder addFieldTypes(Class... fieldTypes) {
+        public Builder addFieldTypes(Class<?>... fieldTypes) {
             Collections.addAll(ft, fieldTypes);
             return this;
         }
 
-        public Builder addFieldTypes(Iterable<Class> fieldTypes) {
-            for (Class c : fieldTypes) {
+        public Builder addFieldTypes(Iterable<Class<?>> fieldTypes) {
+            for (Class<?> c : fieldTypes) {
                 ft.add(c);
             }
             return this;
@@ -191,7 +191,7 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
         return Arrays.deepHashCode(new Object[]{fieldNames, fieldTypes});
     }
 
-    public Class tupleClass() {
+    public Class<?> tupleClass() {
         return clazz;
     }
 
@@ -199,7 +199,7 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
         return fieldNames.clone();
     }
 
-    public Class[] getFieldTypes() {
+    public Class<?>[] getFieldTypes() {
         return fieldTypes.clone();
     }
 

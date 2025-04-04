@@ -16,7 +16,7 @@ public class SchemaBuilderTests {
     void testNonInterface() {
 
         final List<String> nameList = Arrays.asList("a", "b", "c");
-        final List<Class> typeList = Arrays.asList(Long.TYPE, Long.TYPE, Long.TYPE);
+        final List<Class<?>> typeList = Arrays.asList(Long.TYPE, Long.TYPE, Long.TYPE);
         final IllegalArgumentException exn = assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder().
                 addFieldNames(nameList).
                 addFieldTypes(typeList).
@@ -83,9 +83,10 @@ public class SchemaBuilderTests {
                 addField("d", Integer.TYPE).
                 heapMemory().
                 build();
+        //noinspection EqualsWithItself
         assertEquals(schema, schema);
         //noinspection RedundantCast - Suppress this because we need to test the equals method
-        assertNotEquals((Object) schema, (Object) "I'm a string");
+        assertNotEquals((Object) "I'm a string", (Object) schema);
         assertNotEquals(schema, s2);
         assertEquals("('a':long,'b':long,'c':long)", schema.toString());
         assertEquals(schema.hashCode(), schema.hashCode());
