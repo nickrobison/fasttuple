@@ -86,6 +86,7 @@ public class TuplePool<T> {
             for (T tuple : tuples) {
                 deque.push(tuple);
             }
+            assert !references.isEmpty();
         } catch (Exception ex) {
             throw new IllegalStateException("Unable to reload Tuple pool");
         }
