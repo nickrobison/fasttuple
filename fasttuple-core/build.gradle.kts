@@ -22,6 +22,7 @@ configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
     junit5PluginVersion = "1.2.2"
     threads = 4
     targetClasses.add("com.nickrobison.tuple.*")
+    excludedClasses.add("com.nickrobison.tuple.*DirectTuple*")
     outputFormats.add("HTML")
 }
 
