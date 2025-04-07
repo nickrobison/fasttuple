@@ -157,7 +157,6 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
                 }
         );
         cu.addPackageMemberTypeDeclaration(cd);
-        cd.addConstructor(nullConstructor(loc));
         cd.addDeclaredMethod(generateFrontendMethod(loc));
         cd.addDeclaredMethod(generateBackendMethod(parser));
         this.evaluatorClass = compileToClass(cu);

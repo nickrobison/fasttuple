@@ -5,6 +5,8 @@ import com.nickrobison.tuple.HeapTupleSchema;
 import com.nickrobison.tuple.TupleSchema;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -26,6 +28,7 @@ public class HeapTupleCodeGeneratorTest {
 
         HeapTupleCodeGenerator codegen = new HeapTupleCodeGenerator(null, schema.getFieldNames(), schema.getFieldTypes());
         Class<?> clazz = codegen.cookToClass();
+        assertNullConstructorGenerated(clazz);
         assertGetterAndSetterGenerated(clazz, "a", long.class);
         assertGetterAndSetterGenerated(clazz, "b", int.class);
         assertGetterAndSetterGenerated(clazz, "c", short.class);
@@ -109,7 +112,7 @@ public class HeapTupleCodeGeneratorTest {
                 heapMemory().
                 build();
         FastTuple tuple = schema.createTuple();
-        assertTrue(tuple instanceof StaticBinding);
+        assertInstanceOf(StaticBinding.class, tuple);
     }
 
     public void assertGetterAndSetterGenerated(Class<?> clazz, String name, Class<?> type) throws Exception {
@@ -152,6 +155,17 @@ public class HeapTupleCodeGeneratorTest {
         }
     }
 
+    public void assertNullConstructorGenerated(Class<?> clazz) {
+        // Check for a no-arg constructor
+        try {
+            final Constructor<?> declaredConstructor = clazz.getDeclaredConstructor();
+            assertEquals(0, declaredConstructor.getParameterTypes().length);
+        } catch (NoSuchMethodException e) {
+            fail("No-arg constructor not found in class: " + clazz.getName());
+        }
+    }
+
+    @SuppressWarnings("unused")
     public interface StaticBinding {
         void a(long a);
         long a();

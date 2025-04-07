@@ -82,9 +82,11 @@ public class TuplePool<T> {
         try {
             final T[] tuples = loader.createArray(reloadSize);
             size += reloadSize;
+            references.add(tuples);
             for (T tuple : tuples) {
                 deque.push(tuple);
             }
+            assert !references.isEmpty();
         } catch (Exception ex) {
             throw new IllegalStateException("Unable to reload Tuple pool");
         }
@@ -97,5 +99,8 @@ public class TuplePool<T> {
         }
         references.clear();
         pool.remove();
+        assert references.isEmpty();
     }
+
+
 }

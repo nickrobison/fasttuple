@@ -88,15 +88,14 @@ public class TuplePoolTest {
                     Arrays.fill(ary, 0L);
                     return ary;
                 },
-                ary -> {
+                ary -> destroyed.set(true));
 
-                });
-
-        pool.checkout();
+        final Long value = pool.checkout();
         pool.close();
+        assertThrows(IllegalStateException.class, () -> pool.release(value));
         final IllegalStateException exn = assertThrows(IllegalStateException.class, pool::checkout);
         assertEquals("Pool's closed everyone out!", exn.getLocalizedMessage());
-//        assertTrue(destroyed.get()); // FIXME: Destroyer is never actually called
+        assertTrue(destroyed.get());
     }
 
     @Test

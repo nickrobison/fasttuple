@@ -217,4 +217,30 @@ public class TupleExpressionGeneratorTest {
 
         assertThrows(CompileException.class, () -> TupleExpressionGenerator.builder().expression("tuple.a + tuple.b == tuple.c").schema(schema).returnDouble());
     }
+
+
+    @SuppressWarnings({"EqualsBetweenInconvertibleTypes", "SimplifiableAssertion", "EqualsWithItself"})
+    @Test
+    void testEqualsHashCode() throws Exception {
+        TupleSchema schema = TupleSchema.builder().
+                addField("a", Double.TYPE).
+                addField("b", Double.TYPE).
+                addField("c", Double.TYPE).
+                heapMemory().
+                build();
+
+        assertFalse(schema.equals("Hello"));
+
+        TupleExpressionGenerator.TupleExpression expr1 = TupleExpressionGenerator.builder().expression("tuple.a(100), tuple.b(200), tuple.c(300)").schema(schema).returnVoid();
+        TupleExpressionGenerator.TupleExpression expr2 = TupleExpressionGenerator.builder().expression("tuple.a(100), tuple.b(200), tuple.c(300)").schema(schema).returnVoid();
+        TupleExpressionGenerator.TupleExpression expr3 = TupleExpressionGenerator.builder().expression("tuple.a(100), tuple.b(200), tuple.c(500)").schema(schema).returnVoid();
+        assertFalse(expr1.equals("Hello"));
+        assertTrue(expr1.equals(expr1));
+        assertFalse(expr1.hashCode() == expr2.hashCode());
+        assertFalse(expr1.equals(expr2));
+        assertFalse(expr1.hashCode() == expr2.hashCode());
+        assertFalse(expr1.equals(expr3));
+        assertFalse(expr1.hashCode() == expr3.hashCode());
+
+    }
 }

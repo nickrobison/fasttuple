@@ -7,7 +7,7 @@ import org.codehaus.janino.Java;
 
 import java.util.Collections;
 
-import static com.nickrobison.tuple.codegen.CodegenUtil.*;
+import static com.nickrobison.tuple.codegen.CodegenUtil.emptyParams;
 
 /**
  * Created by cliff on 5/14/14.
@@ -36,7 +36,7 @@ public class TupleAllocatorGenerator extends ClassBodyEvaluator {
         return (TupleAllocator) allocatorClass.getConstructor().newInstance();
     }
 
-    private Java.PackageMemberClassDeclaration makeClassDefinition(Location loc, Class <?>tupleClass, String className) {
+    private Java.PackageMemberClassDeclaration makeClassDefinition(Location loc, Class<?> tupleClass, String className) {
         Java.PackageMemberClassDeclaration cd = new Java.PackageMemberClassDeclaration(
                 loc,
                 null,
@@ -48,7 +48,6 @@ public class TupleAllocatorGenerator extends ClassBodyEvaluator {
                         classToType(loc, TupleAllocator.class)
                 });
 
-        cd.addConstructor(nullConstructor(loc));
         cd.addDeclaredMethod(new Java.MethodDeclarator(
                 loc,
                 null,
