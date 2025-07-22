@@ -8,7 +8,7 @@ plugins {
     id("net.researchgate.release")
 }
 
-val junitVersion = "5.12.1"
+val junitVersion = "5.13.4"
 
 dependencies {
     api("org.codehaus.janino:janino:${rootProject.ext.get("janinoVersion")}")
