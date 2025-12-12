@@ -3,11 +3,11 @@ package com.nickrobison.tuple.codegen;
 import com.nickrobison.tuple.FastTuple;
 import org.codehaus.commons.compiler.InternalCompilerException;
 import org.codehaus.commons.compiler.Location;
-import org.codehaus.janino.ClassBodyEvaluator;
 import org.codehaus.janino.Java;
 import org.codehaus.janino.SimpleCompiler;
 
 import java.util.Collections;
+import java.util.Objects;
 
 import static com.nickrobison.tuple.codegen.CodegenUtil.emptyParams;
 
@@ -35,8 +35,8 @@ public class TupleAllocatorGenerator extends SimpleCompiler {
             allocatorClass = getClassLoader().loadClass(packageName + "." + className);
         } catch (ClassNotFoundException ex) {
             throw new InternalCompilerException(
-                "SNO: Generated compilation unit does not declare class '" + packageName + "." + className + "'",
-                ex
+                    "SNO: Generated compilation unit does not declare class '" + packageName + "." + className + "'",
+                    ex
             );
         }
     }
@@ -78,5 +78,18 @@ public class TupleAllocatorGenerator extends SimpleCompiler {
         ));
 
         return cd;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TupleAllocatorGenerator)) return false;
+        TupleAllocatorGenerator that = (TupleAllocatorGenerator) o;
+        return Objects.equals(allocatorClass, that.allocatorClass);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(allocatorClass);
     }
 }

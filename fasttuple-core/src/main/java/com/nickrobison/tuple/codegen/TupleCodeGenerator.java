@@ -4,14 +4,15 @@ import com.nickrobison.tuple.FastTuple;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.commons.compiler.InternalCompilerException;
 import org.codehaus.commons.compiler.Location;
-import org.codehaus.janino.ClassBodyEvaluator;
 import org.codehaus.janino.Java;
 import org.codehaus.janino.Java.AbstractCompilationUnit.SingleTypeImportDeclaration;
 import org.codehaus.janino.SimpleCompiler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.nickrobison.tuple.codegen.CodegenUtil.nullConstructor;
@@ -288,5 +289,21 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
         } else {
             return new Java.ReferenceType(loc, new Java.NormalAnnotation[]{}, type.getCanonicalName().split("\\."), null);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TupleCodeGenerator)) return false;
+        TupleCodeGenerator that = (TupleCodeGenerator) o;
+        return Objects.equals(iface, that.iface)
+                && Objects.deepEquals(fieldNames, that.fieldNames)
+                && Objects.deepEquals(fieldTypes, that.fieldTypes)
+                && Objects.equals(className, that.className);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(iface, Arrays.hashCode(fieldNames), Arrays.hashCode(fieldTypes), className);
     }
 }
