@@ -1,12 +1,13 @@
 package com.nickrobison.tuple;
 
+import java.util.ArrayDeque;
+
 import com.nickrobison.tuple.codegen.TupleExpressionGenerator;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-
-import java.util.ArrayDeque;
 
 /**
  * Created by cliff on 5/12/14.
@@ -23,22 +24,13 @@ public class FastTupleBenchmarks {
 
         @Setup
         public void setup() throws Exception {
-            schema = TupleSchema.builder().
-                    addField("a", Long.TYPE).
-                    addField("b", Integer.TYPE).
-                    addField("c", Short.TYPE).
-                    implementInterface(StaticBinding.class).
-                    poolOfSize(10).
-                    directMemory().
-                    build();
-            eval1 = TupleExpressionGenerator.builder().
-                    expression("tuple.a(100L), tuple.b(200), tuple.c((short)300)").
-                    schema(schema).
-                    returnVoid();
-            eval2 = TupleExpressionGenerator.builder().
-                    expression("tuple.a() + tuple.b() + tuple.c()").
-                    schema(schema).
-                    returnLong();
+            schema = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Integer.TYPE)
+                    .addField("c", Short.TYPE).implementInterface(StaticBinding.class).poolOfSize(10).directMemory()
+                    .build();
+            eval1 = TupleExpressionGenerator.builder().expression("tuple.a(100L), tuple.b(200), tuple.c((short)300)")
+                    .schema(schema).returnVoid();
+            eval2 = TupleExpressionGenerator.builder().expression("tuple.a() + tuple.b() + tuple.c()").schema(schema)
+                    .returnLong();
 
             deque = new ArrayDeque<>();
             for (FastTuple tuple : schema.createTupleArray(10)) {
@@ -61,31 +53,18 @@ public class FastTupleBenchmarks {
 
         @Setup
         public void setup() throws Exception {
-            schema = TupleSchema.builder().
-                    addField("a", Long.TYPE).
-                    addField("b", Integer.TYPE).
-                    addField("c", Short.TYPE).
-                    poolOfSize(10).
-                    implementInterface(StaticBinding.class).
-                    heapMemory().
-                    build();
-            eval1 = TupleExpressionGenerator.builder().
-                    expression("tuple.a(100L), tuple.b(200), tuple.c((short)300)").
-                    schema(schema).
-                    returnVoid();
-            eval2 = TupleExpressionGenerator.builder().
-                    expression("tuple.a() + tuple.b() + tuple.c()").
-                    schema(schema).
-                    returnLong();
+            schema = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Integer.TYPE)
+                    .addField("c", Short.TYPE).poolOfSize(10).implementInterface(StaticBinding.class).heapMemory()
+                    .build();
+            eval1 = TupleExpressionGenerator.builder().expression("tuple.a(100L), tuple.b(200), tuple.c((short)300)")
+                    .schema(schema).returnVoid();
+            eval2 = TupleExpressionGenerator.builder().expression("tuple.a() + tuple.b() + tuple.c()").schema(schema)
+                    .returnLong();
 
-            eval3 = TupleExpressionGenerator.builder().
-                    expression("tuple.a = 100L, tuple.b = 200, tuple.c = (short)300").
-                    schema(schema).
-                    returnVoid();
-            eval4 = TupleExpressionGenerator.builder().
-                    expression("tuple.a + tuple.b + tuple.c").
-                    schema(schema).
-                    returnLong();
+            eval3 = TupleExpressionGenerator.builder().expression("tuple.a = 100L, tuple.b = 200, tuple.c = (short)300")
+                    .schema(schema).returnVoid();
+            eval4 = TupleExpressionGenerator.builder().expression("tuple.a + tuple.b + tuple.c").schema(schema)
+                    .returnLong();
 
             deque = new ArrayDeque<>();
             for (FastTuple tuple : schema.createTupleArray(10)) {
@@ -98,10 +77,15 @@ public class FastTupleBenchmarks {
 
     public static interface StaticBinding {
         public void a(long a);
+
         public void b(int b);
+
         public void c(short c);
+
         public long a();
+
         public int b();
+
         public short c();
     }
 
@@ -133,9 +117,9 @@ public class FastTupleBenchmarks {
 
             tuple.set(1, 100L);
             tuple.set(2, 200);
-            tuple.set(3, (short)300);
+            tuple.set(3, (short) 300);
 
-            long r = (Long)tuple.get(1) + (Integer)tuple.get(2) + (Short)tuple.get(3);
+            long r = (Long) tuple.get(1) + (Integer) tuple.get(2) + (Short) tuple.get(3);
             ds.schema.pool().release(tuple);
             return r;
         }
@@ -146,9 +130,9 @@ public class FastTupleBenchmarks {
 
             tuple.set(1, 100L);
             tuple.set(2, 200);
-            tuple.set(3, (short)300);
+            tuple.set(3, (short) 300);
 
-            return (Long)tuple.get(1) + (Integer)tuple.get(2) + (Short)tuple.get(3);
+            return (Long) tuple.get(1) + (Integer) tuple.get(2) + (Short) tuple.get(3);
         }
 
         @Benchmark
@@ -157,7 +141,7 @@ public class FastTupleBenchmarks {
 
             tuple.setLong(1, 100L);
             tuple.setInt(2, 200);
-            tuple.setShort(3, (short)300);
+            tuple.setShort(3, (short) 300);
 
             long r = tuple.getLong(1) + tuple.getInt(2) + tuple.getShort(3);
             ds.schema.pool().release(tuple);
@@ -170,7 +154,7 @@ public class FastTupleBenchmarks {
 
             tuple.setLong(1, 100L);
             tuple.setInt(2, 200);
-            tuple.setShort(3, (short)300);
+            tuple.setShort(3, (short) 300);
 
             return tuple.getLong(1) + tuple.getInt(2) + tuple.getShort(3);
         }
@@ -195,24 +179,24 @@ public class FastTupleBenchmarks {
 
         @Benchmark
         public long measureDirectSchemaPoolIface(DirectSchema ds) throws Exception {
-            StaticBinding tuple = (StaticBinding)ds.schema.pool().checkout();
+            StaticBinding tuple = (StaticBinding) ds.schema.pool().checkout();
 
             tuple.a(100L);
             tuple.b(200);
-            tuple.c((short)300);
+            tuple.c((short) 300);
 
             long r = tuple.a() + tuple.b() + tuple.c();
-            ds.schema.pool().release((FastTuple)tuple);
+            ds.schema.pool().release((FastTuple) tuple);
             return r;
         }
 
         @Benchmark
         public long measureDirectSchemaPreallocIface(DirectSchema ds) throws Exception {
-            StaticBinding tuple = (StaticBinding)ds.tuple;
+            StaticBinding tuple = (StaticBinding) ds.tuple;
 
             tuple.a(100L);
             tuple.b(200);
-            tuple.c((short)300);
+            tuple.c((short) 300);
 
             return tuple.a() + tuple.b() + tuple.c();
         }
@@ -245,9 +229,9 @@ public class FastTupleBenchmarks {
 
             tuple.set(1, 100L);
             tuple.set(2, 200);
-            tuple.set(3, (short)300);
+            tuple.set(3, (short) 300);
 
-            long r = (Long)tuple.get(1) + (Integer)tuple.get(2) + (Short)tuple.get(3);
+            long r = (Long) tuple.get(1) + (Integer) tuple.get(2) + (Short) tuple.get(3);
             hs.schema.pool().release(tuple);
             return r;
         }
@@ -258,9 +242,9 @@ public class FastTupleBenchmarks {
 
             tuple.set(1, 100L);
             tuple.set(2, 200);
-            tuple.set(3, (short)300);
+            tuple.set(3, (short) 300);
 
-            return (Long)tuple.get(1) + (Integer)tuple.get(2) + (Short)tuple.get(3);
+            return (Long) tuple.get(1) + (Integer) tuple.get(2) + (Short) tuple.get(3);
         }
 
         @Benchmark
@@ -269,7 +253,7 @@ public class FastTupleBenchmarks {
 
             tuple.setLong(1, 100L);
             tuple.setInt(2, 200);
-            tuple.setShort(3, (short)300);
+            tuple.setShort(3, (short) 300);
 
             long r = tuple.getLong(1) + tuple.getInt(2) + tuple.getShort(3);
             hs.schema.pool().release(tuple);
@@ -282,7 +266,7 @@ public class FastTupleBenchmarks {
 
             tuple.setLong(1, 100L);
             tuple.setInt(2, 200);
-            tuple.setShort(3, (short)300);
+            tuple.setShort(3, (short) 300);
 
             return tuple.getLong(1) + tuple.getInt(2) + tuple.getShort(3);
         }
@@ -315,24 +299,24 @@ public class FastTupleBenchmarks {
 
         @Benchmark
         public long measureHeapSchemaPoolIface(HeapSchema hs) throws Exception {
-            StaticBinding tuple = (StaticBinding)hs.schema.pool().checkout();
+            StaticBinding tuple = (StaticBinding) hs.schema.pool().checkout();
 
             tuple.a(100L);
             tuple.b(200);
-            tuple.c((short)300);
+            tuple.c((short) 300);
 
             long r = tuple.a() + tuple.b() + tuple.c();
-            hs.schema.pool().release((FastTuple)tuple);
+            hs.schema.pool().release((FastTuple) tuple);
             return r;
         }
 
         @Benchmark
         public long measureHeapSchemaPreallocIface(HeapSchema hs) throws Exception {
-            StaticBinding tuple = (StaticBinding)hs.tuple;
+            StaticBinding tuple = (StaticBinding) hs.tuple;
 
             tuple.a(100L);
             tuple.b(200);
-            tuple.c((short)300);
+            tuple.c((short) 300);
 
             return tuple.a() + tuple.b() + tuple.c();
         }

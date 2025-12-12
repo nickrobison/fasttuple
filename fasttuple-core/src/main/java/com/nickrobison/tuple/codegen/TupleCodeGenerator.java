@@ -1,19 +1,20 @@
 package com.nickrobison.tuple.codegen;
 
-import com.nickrobison.tuple.FastTuple;
-import org.codehaus.commons.compiler.CompileException;
-import org.codehaus.commons.compiler.InternalCompilerException;
-import org.codehaus.commons.compiler.Location;
-import org.codehaus.janino.Java;
-import org.codehaus.janino.Java.AbstractCompilationUnit.SingleTypeImportDeclaration;
-import org.codehaus.janino.SimpleCompiler;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
+
+import com.nickrobison.tuple.FastTuple;
+
+import org.codehaus.commons.compiler.CompileException;
+import org.codehaus.commons.compiler.InternalCompilerException;
+import org.codehaus.commons.compiler.Location;
+import org.codehaus.janino.Java;
+import org.codehaus.janino.Java.AbstractCompilationUnit.SingleTypeImportDeclaration;
+import org.codehaus.janino.SimpleCompiler;
 
 import static com.nickrobison.tuple.codegen.CodegenUtil.nullConstructor;
 import static java.lang.Character.toUpperCase;
@@ -25,15 +26,8 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
     public static final String VALUE = "value";
     public static final String INDEX = "index";
     private static final AtomicLong counter = new AtomicLong(0L);
-    protected static final Class<?>[] types = new Class[]{
-            Long.TYPE,
-            Integer.TYPE,
-            Short.TYPE,
-            Character.TYPE,
-            Byte.TYPE,
-            Float.TYPE,
-            Double.TYPE
-    };
+    protected static final Class<?>[] types = new Class[] { Long.TYPE, Integer.TYPE, Short.TYPE, Character.TYPE,
+            Byte.TYPE, Float.TYPE, Double.TYPE };
     protected final Class<?> iface;
     protected final String[] fieldNames;
     protected final Class<?>[] fieldTypes;
@@ -58,31 +52,27 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
             return getClassLoader().loadClass("com.nickrobison.tuple." + className);
         } catch (ClassNotFoundException ex) {
             throw new InternalCompilerException(
-                "SNO: Generated compilation unit does not declare class 'com.nickrobison.tuple." + className + "'",
-                ex
-            );
+                    "SNO: Generated compilation unit does not declare class 'com.nickrobison.tuple." + className + "'",
+                    ex);
         }
     }
 
     protected Java.CompilationUnit makeCompilationUnit() throws CompileException {
-        Java.CompilationUnit cu = new Java.CompilationUnit(null, new SingleTypeImportDeclaration[]{new SingleTypeImportDeclaration(loc, "com.nickrobison.tuple.unsafe.Coterie".split("\\."))});
+        Java.CompilationUnit cu = new Java.CompilationUnit(null, new SingleTypeImportDeclaration[] {
+                new SingleTypeImportDeclaration(loc, "com.nickrobison.tuple.unsafe.Coterie".split("\\.")) });
         Location cuLoc = new Location("", ((short) 0), ((short) 0));
         cu.setPackageDeclaration(new Java.PackageDeclaration(cuLoc, "com.nickrobison.tuple"));
         Class<?>[] ifaces;
         if (iface != null) {
-            ifaces = new Class[]{iface};
+            ifaces = new Class[] { iface };
         } else {
-            ifaces = new Class[]{};
+            ifaces = new Class[] {};
         }
-        Java.PackageMemberClassDeclaration cd = new Java.PackageMemberClassDeclaration(
-                cuLoc,
-                null, //doc
-                new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, cuLoc)},
-                className,
-                null, //type parameters
-                classToType(cuLoc, FastTuple.class), //class to extend
-                classesToTypes(cuLoc, ifaces)
-        );
+        Java.PackageMemberClassDeclaration cd = new Java.PackageMemberClassDeclaration(cuLoc, null, // doc
+                new Java.AccessModifier[] { new Java.AccessModifier(CodegenUtil.PUBLIC, cuLoc) }, className, null, // type
+                                                                                                                   // parameters
+                classToType(cuLoc, FastTuple.class), // class to extend
+                classesToTypes(cuLoc, ifaces));
         cu.addPackageMemberTypeDeclaration(cd);
         for (Java.FieldDeclaration dec : generateFields()) {
             cd.addFieldDeclaration(dec);
@@ -93,7 +83,6 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
         for (int i = 0; i < fieldNames.length; i++) {
             String name = fieldNames[i];
             Class<?> type = fieldTypes[i];
-
 
             cd.addDeclaredMethod(generateGetter(name, type, i));
             cd.addDeclaredMethod(generateSetter(name, type, i));
@@ -110,41 +99,31 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
     }
 
     protected Java.MethodDeclarator generateIndexedGetter() {
-        return new Java.MethodDeclarator(
-                loc,
-                null,
-                new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)},
-                null,
-                classToType(loc, Object.class),
-                "get",
-                new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{
-                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, classToType(loc, Integer.TYPE), INDEX)}, false),
-                new Java.Type[]{},
-                null,
-                Collections.singletonList(
-                        new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[]{INDEX}), generateIndexedGetterImpl())
-                )
-        );
+        return new Java.MethodDeclarator(loc, null,
+                new Java.AccessModifier[] { new Java.AccessModifier(CodegenUtil.PUBLIC, loc) }, null,
+                classToType(loc, Object.class), "get",
+                new Java.FunctionDeclarator.FormalParameters(loc,
+                        new Java.FunctionDeclarator.FormalParameter[] { new Java.FunctionDeclarator.FormalParameter(loc,
+                                new Java.AccessModifier[] { new Java.AccessModifier(CodegenUtil.PUBLIC, loc) },
+                                classToType(loc, Integer.TYPE), INDEX) },
+                        false),
+                new Java.Type[] {}, null, Collections.singletonList(new Java.SwitchStatement(loc,
+                        new Java.AmbiguousName(loc, new String[] { INDEX }), generateIndexedGetterImpl())));
     }
 
     protected List<Java.MethodDeclarator> generateIndexedTypedGetters() {
         List<Java.MethodDeclarator> methods = new ArrayList<>();
         for (Class<?> type : types) {
-            methods.add(new Java.MethodDeclarator(
-                    loc,
-                    null,
-                    new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)},
-                    null,
-                    new Java.PrimitiveType(loc, primIndex(type)),
-                    "get" + capitalize(type.getName()),
-                    new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{
-                            new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, new Java.PrimitiveType(loc, Java.Primitive.INT), INDEX)}, false),
-                    new Java.Type[]{},
-                    null,
-                    Collections.singletonList(
-                            new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[]{INDEX}), generateIndexedGetterImpl(type))
-                    )
-            ));
+            methods.add(new Java.MethodDeclarator(loc, null,
+                    new Java.AccessModifier[] { new Java.AccessModifier(CodegenUtil.PUBLIC, loc) }, null,
+                    new Java.PrimitiveType(loc, primIndex(type)), "get" + capitalize(type.getName()),
+                    new Java.FunctionDeclarator.FormalParameters(loc,
+                            new Java.FunctionDeclarator.FormalParameter[] { new Java.FunctionDeclarator.FormalParameter(
+                                    loc, new Java.AccessModifier[] { new Java.AccessModifier(CodegenUtil.PUBLIC, loc) },
+                                    new Java.PrimitiveType(loc, Java.Primitive.INT), INDEX) },
+                            false),
+                    new Java.Type[] {}, null, Collections.singletonList(new Java.SwitchStatement(loc,
+                            new Java.AmbiguousName(loc, new String[] { INDEX }), generateIndexedGetterImpl(type)))));
         }
         return methods;
     }
@@ -152,88 +131,79 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
     protected List<Java.MethodDeclarator> generateIndexedTypedSetters() throws CompileException {
         List<Java.MethodDeclarator> methods = new ArrayList<>();
         for (Class<?> type : types) {
-            methods.add(new Java.MethodDeclarator(
-                    loc,
-                    null,
-                    new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)},
-                    null,
-                    new Java.PrimitiveType(loc, Java.Primitive.VOID),
-                    "set" + capitalize(type.getName()),
-                    new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{
-                            new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, new Java.PrimitiveType(loc, Java.Primitive.INT), INDEX),
-                            new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, new Java.PrimitiveType(loc, primIndex(type)), VALUE)
-                    }, false),
-                    new Java.Type[]{},
-                    null,
-                    Collections.singletonList(
-                            new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[]{INDEX}), generateIndexedSetterImpl(VALUE, type))
-                    )
-            ));
+            methods.add(
+                    new Java.MethodDeclarator(
+                            loc, null, new Java.AccessModifier[] { new Java.AccessModifier(CodegenUtil.PUBLIC,
+                                    loc) },
+                            null, new Java.PrimitiveType(loc, Java.Primitive.VOID), "set" + capitalize(type.getName()),
+                            new Java.FunctionDeclarator.FormalParameters(loc,
+                                    new Java.FunctionDeclarator.FormalParameter[] {
+                                            new Java.FunctionDeclarator.FormalParameter(loc,
+                                                    new Java.AccessModifier[] {
+                                                            new Java.AccessModifier(CodegenUtil.PUBLIC, loc) },
+                                                    new Java.PrimitiveType(loc, Java.Primitive.INT), INDEX),
+                                            new Java.FunctionDeclarator.FormalParameter(loc,
+                                                    new Java.AccessModifier[] {
+                                                            new Java.AccessModifier(CodegenUtil.PUBLIC, loc) },
+                                                    new Java.PrimitiveType(loc, primIndex(type)), VALUE) },
+                                    false),
+                            new Java.Type[] {}, null,
+                            Collections.singletonList(
+                                    new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[] { INDEX }),
+                                            generateIndexedSetterImpl(VALUE, type)))));
         }
         return methods;
     }
 
     protected Java.MethodDeclarator generateIndexedSetter() throws CompileException {
         return new Java.MethodDeclarator(
-                loc,
-                null,
-                new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)},
-                null,
-                classToType(loc, Void.TYPE),
-                "set",
-                new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{
-                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, classToType(loc, Integer.TYPE), INDEX),
-                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, classToType(loc, Object.class), VALUE)
-                }, false),
-                new Java.Type[]{},
-                null,
-                Collections.singletonList(
-                        new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[]{INDEX}), generateIndexedSetterImpl(VALUE))
-                )
-        );
+                loc, null, new Java.AccessModifier[] { new Java.AccessModifier(CodegenUtil.PUBLIC,
+                        loc) },
+                null, classToType(loc, Void.TYPE), "set",
+                new Java.FunctionDeclarator.FormalParameters(loc,
+                        new Java.FunctionDeclarator.FormalParameter[] {
+                                new Java.FunctionDeclarator.FormalParameter(loc,
+                                        new Java.AccessModifier[] { new Java.AccessModifier(CodegenUtil.PUBLIC, loc) },
+                                        classToType(loc, Integer.TYPE), INDEX),
+                                new Java.FunctionDeclarator.FormalParameter(loc,
+                                        new Java.AccessModifier[] { new Java.AccessModifier(CodegenUtil.PUBLIC, loc) },
+                                        classToType(loc, Object.class), VALUE) },
+                        false),
+                new Java.Type[] {}, null, Collections.singletonList(new Java.SwitchStatement(loc,
+                        new Java.AmbiguousName(loc, new String[] { INDEX }), generateIndexedSetterImpl(VALUE))));
     }
 
     protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl();
 
     protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedGetterImpl(Class<?> type);
 
-    protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value) throws CompileException;
+    protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value)
+            throws CompileException;
 
-    protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value, Class<?> type) throws CompileException;
+    protected abstract List<Java.SwitchStatement.SwitchBlockStatementGroup> generateIndexedSetterImpl(String value,
+            Class<?> type) throws CompileException;
 
     protected Java.MethodDeclarator generateGetter(String name, Class<?> type, int index) {
         // unsafe().get* (long)
         Java.BlockStatement st = new Java.ReturnStatement(loc, generateGetInvocation(type, index));
-        return new Java.MethodDeclarator(
-                loc,
-                null,
-                new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)},
-                null,
-                classToType(loc, type),
-                name,
-                new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{}, false),
-                new Java.Type[]{},
-                null,
-                Collections.singletonList(st)
-        );
+        return new Java.MethodDeclarator(loc, null,
+                new Java.AccessModifier[] { new Java.AccessModifier(CodegenUtil.PUBLIC, loc) }, null,
+                classToType(loc, type), name, new Java.FunctionDeclarator.FormalParameters(loc,
+                        new Java.FunctionDeclarator.FormalParameter[] {}, false),
+                new Java.Type[] {}, null, Collections.singletonList(st));
     }
 
     protected Java.MethodDeclarator generateSetter(String name, Class<?> type, int index) throws CompileException {
         Java.BlockStatement st = new Java.ExpressionStatement(generateSetInvocation(type, index, VALUE));
-        return new Java.MethodDeclarator(
-                loc,
-                null,
-                new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)},
-                null,
-                classToType(loc, Void.TYPE),
-                name,
-                new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{
-                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, classToType(loc, type), VALUE)
-                }, false),
-                new Java.Type[]{},
-                null,
-                Collections.singletonList(st)
-        );
+        return new Java.MethodDeclarator(loc, null,
+                new Java.AccessModifier[] { new Java.AccessModifier(CodegenUtil.PUBLIC, loc) }, null,
+                classToType(loc, Void.TYPE), name,
+                new Java.FunctionDeclarator.FormalParameters(loc,
+                        new Java.FunctionDeclarator.FormalParameter[] { new Java.FunctionDeclarator.FormalParameter(loc,
+                                new Java.AccessModifier[] { new Java.AccessModifier(CodegenUtil.PUBLIC, loc) },
+                                classToType(loc, type), VALUE) },
+                        false),
+                new Java.Type[] {}, null, Collections.singletonList(st));
     }
 
     protected abstract Java.Rvalue generateGetInvocation(Class<?> type, int index);
@@ -244,62 +214,70 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
         return toUpperCase(st.charAt(0)) + st.substring(1);
     }
 
-
     protected Java.Primitive primIndex(Class<?> type) {
-        if (type.equals(Long.TYPE)) return Java.Primitive.LONG;
-        if (type.equals(Integer.TYPE)) return Java.Primitive.INT;
-        if (type.equals(Short.TYPE)) return Java.Primitive.SHORT;
-        if (type.equals(Character.TYPE)) return Java.Primitive.CHAR;
-        if (type.equals(Byte.TYPE)) return Java.Primitive.BYTE;
-        if (type.equals(Float.TYPE)) return Java.Primitive.FLOAT;
-        if (type.equals(Double.TYPE)) return Java.Primitive.DOUBLE;
+        if (type.equals(Long.TYPE))
+            return Java.Primitive.LONG;
+        if (type.equals(Integer.TYPE))
+            return Java.Primitive.INT;
+        if (type.equals(Short.TYPE))
+            return Java.Primitive.SHORT;
+        if (type.equals(Character.TYPE))
+            return Java.Primitive.CHAR;
+        if (type.equals(Byte.TYPE))
+            return Java.Primitive.BYTE;
+        if (type.equals(Float.TYPE))
+            return Java.Primitive.FLOAT;
+        if (type.equals(Double.TYPE))
+            return Java.Primitive.DOUBLE;
         return Java.Primitive.VOID;
     }
 
     protected String primToBox(Class<?> type) {
-        if (type.equals(Long.TYPE)) return "Long";
-        if (type.equals(Integer.TYPE)) return "Integer";
-        if (type.equals(Short.TYPE)) return "Short";
-        if (type.equals(Character.TYPE)) return "Character";
-        if (type.equals(Byte.TYPE)) return "Byte";
-        if (type.equals(Float.TYPE)) return "Float";
-        if (type.equals(Double.TYPE)) return "Double";
+        if (type.equals(Long.TYPE))
+            return "Long";
+        if (type.equals(Integer.TYPE))
+            return "Integer";
+        if (type.equals(Short.TYPE))
+            return "Short";
+        if (type.equals(Character.TYPE))
+            return "Character";
+        if (type.equals(Byte.TYPE))
+            return "Byte";
+        if (type.equals(Float.TYPE))
+            return "Float";
+        if (type.equals(Double.TYPE))
+            return "Double";
         throw new IllegalArgumentException(String.format("Unsupported type: %s", type.getSimpleName()));
     }
 
     protected Java.SwitchStatement.SwitchBlockStatementGroup generateDefaultCase() {
-        return new Java.SwitchStatement.SwitchBlockStatementGroup(
-                loc,
-                Collections.emptyList(),
-                true,
-                Collections.singletonList(
-                        new Java.ThrowStatement(
-                                loc,
-                                new Java.NewClassInstance(
-                                        loc,
-                                        null,
-                                        new Java.ReferenceType(loc, new Java.NormalAnnotation[]{}, new String[]{"IllegalArgumentException"}, null),
-                                        new Java.Rvalue[0]))
-                ));
+        return new Java.SwitchStatement.SwitchBlockStatementGroup(loc, Collections.emptyList(), true,
+                Collections
+                        .singletonList(new Java.ThrowStatement(loc,
+                                new Java.NewClassInstance(loc, null,
+                                        new Java.ReferenceType(loc, new Java.NormalAnnotation[] {},
+                                                new String[] { "IllegalArgumentException" }, null),
+                                        new Java.Rvalue[0]))));
     }
 
     protected Java.Type classToRefType(Class<?> type) {
         if (type.isPrimitive()) {
-            return new Java.ReferenceType(loc, new Java.NormalAnnotation[]{}, primToBox(type).split("\\."), null);
+            return new Java.ReferenceType(loc, new Java.NormalAnnotation[] {}, primToBox(type).split("\\."), null);
         } else {
-            return new Java.ReferenceType(loc, new Java.NormalAnnotation[]{}, type.getCanonicalName().split("\\."), null);
+            return new Java.ReferenceType(loc, new Java.NormalAnnotation[] {}, type.getCanonicalName().split("\\."),
+                    null);
         }
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TupleCodeGenerator)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof TupleCodeGenerator))
+            return false;
         TupleCodeGenerator that = (TupleCodeGenerator) o;
-        return Objects.equals(iface, that.iface)
-                && Objects.deepEquals(fieldNames, that.fieldNames)
-                && Objects.deepEquals(fieldTypes, that.fieldTypes)
-                && Objects.equals(className, that.className);
+        return Objects.equals(iface, that.iface) && Objects.deepEquals(fieldNames, that.fieldNames)
+                && Objects.deepEquals(fieldTypes, that.fieldTypes) && Objects.equals(className, that.className);
     }
 
     @Override

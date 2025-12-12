@@ -1,8 +1,8 @@
 package com.nickrobison.tuple;
 
 /**
-* Created by cliff on 5/12/14.
-*/
+ * Created by cliff on 5/12/14.
+ */
 class Container {
     public long a;
     public int b;

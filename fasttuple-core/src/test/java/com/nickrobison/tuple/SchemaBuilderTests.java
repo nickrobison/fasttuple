@@ -1,9 +1,9 @@
 package com.nickrobison.tuple;
 
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.List;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,12 +17,9 @@ public class SchemaBuilderTests {
 
         final List<String> nameList = Arrays.asList("a", "b", "c");
         final List<Class<?>> typeList = Arrays.asList(Long.TYPE, Long.TYPE, Long.TYPE);
-        final IllegalArgumentException exn = assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder().
-                addFieldNames(nameList).
-                addFieldTypes(typeList).
-                implementInterface(String.class).
-                directMemory().
-                build());
+        final IllegalArgumentException exn = assertThrows(IllegalArgumentException.class,
+                () -> TupleSchema.builder().addFieldNames(nameList).addFieldTypes(typeList)
+                        .implementInterface(String.class).directMemory().build());
 
         assertEquals("java.lang.String is not an interface", exn.getLocalizedMessage());
     }
@@ -30,39 +27,24 @@ public class SchemaBuilderTests {
     @Test
     void testUnevenNameFields() {
         final IllegalArgumentException exn = assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder()
-                .addFieldNames("Test", "Field")
-                .addFieldTypes(String.class).
-                heapMemory().
-                build());
+                .addFieldNames("Test", "Field").addFieldTypes(String.class).heapMemory().build());
 
         assertEquals("fieldNames and fieldTypes must have equal length", exn.getLocalizedMessage());
     }
 
     @Test
     void testNonPrimitiveFieldTypes() {
-        assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder()
-                .addFieldNames("Test", "Field")
-                .addFieldTypes(String.class, Integer.class).
-                heapMemory().
-                build());
+        assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder().addFieldNames("Test", "Field")
+                .addFieldTypes(String.class, Integer.class).heapMemory().build());
 
-        assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder()
-                .addFieldNames("Test", "Field")
-                .addFieldTypes(Boolean.class, Integer.class).
-                heapMemory().
-                build());
+        assertThrows(IllegalArgumentException.class, () -> TupleSchema.builder().addFieldNames("Test", "Field")
+                .addFieldTypes(Boolean.class, Integer.class).heapMemory().build());
     }
 
     @Test
     void testBuilderPool() throws Exception {
-        TupleSchema schema = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                addField("b", Long.TYPE).
-                addField("c", Long.TYPE).
-                poolOfSize(10).
-                expandingPool().
-                heapMemory().
-                build();
+        TupleSchema schema = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Long.TYPE)
+                .addField("c", Long.TYPE).poolOfSize(10).expandingPool().heapMemory().build();
 
         // Pool based allocation isn't implemented yet.
         assertEquals(0, schema.pool().getSize());
@@ -70,22 +52,14 @@ public class SchemaBuilderTests {
 
     @Test
     void testHelperMethods() throws Exception {
-        TupleSchema schema = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                addField("b", Long.TYPE).
-                addField("c", Long.TYPE).
-                heapMemory().
-                build();
+        TupleSchema schema = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Long.TYPE)
+                .addField("c", Long.TYPE).heapMemory().build();
 
-        TupleSchema s2 = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                addField("b", Long.TYPE).
-                addField("d", Integer.TYPE).
-                heapMemory().
-                build();
-        //noinspection EqualsWithItself
+        TupleSchema s2 = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Long.TYPE)
+                .addField("d", Integer.TYPE).heapMemory().build();
+        // noinspection EqualsWithItself
         assertEquals(schema, schema);
-        //noinspection RedundantCast - Suppress this because we need to test the equals method
+        // noinspection RedundantCast - Suppress this because we need to test the equals method
         assertNotEquals((Object) "I'm a string", (Object) schema);
         assertNotEquals(schema, s2);
         assertEquals("('a':long,'b':long,'c':long)", schema.toString());

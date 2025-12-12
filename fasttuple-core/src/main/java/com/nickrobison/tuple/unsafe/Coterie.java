@@ -1,8 +1,8 @@
 package com.nickrobison.tuple.unsafe;
 
-import sun.misc.Unsafe;
-
 import java.lang.reflect.Field;
+
+import sun.misc.Unsafe;
 
 /**
  * Created by cliff on 5/2/14.
