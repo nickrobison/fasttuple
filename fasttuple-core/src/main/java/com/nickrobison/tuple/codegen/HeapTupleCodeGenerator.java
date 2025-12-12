@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class HeapTupleCodeGenerator extends TupleCodeGenerator {
 
-    public HeapTupleCodeGenerator(Class<?>iface, String[] fieldName, Class<?>[] fieldType) {
+    public HeapTupleCodeGenerator(Class<?> iface, String[] fieldName, Class<?>[] fieldType) {
         super(iface, fieldName, fieldType);
     }
 

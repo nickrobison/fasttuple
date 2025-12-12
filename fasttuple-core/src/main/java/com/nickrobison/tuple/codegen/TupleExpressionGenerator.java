@@ -2,6 +2,7 @@ package com.nickrobison.tuple.codegen;
 
 import com.nickrobison.tuple.FastTuple;
 import com.nickrobison.tuple.TupleSchema;
+import org.codehaus.commons.compiler.InternalCompilerException;
 import org.codehaus.commons.compiler.Location;
 import org.codehaus.janino.*;
 
@@ -17,7 +18,7 @@ import static com.nickrobison.tuple.codegen.CodegenUtil.*;
 /**
  * Created by cliff on 5/12/14.
  */
-public class TupleExpressionGenerator extends ClassBodyEvaluator {
+public class TupleExpressionGenerator extends SimpleCompiler {
     public interface TupleExpression {
         void evaluate(FastTuple tuple);
     }
@@ -75,7 +76,8 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
         private String expression = null;
         private TupleSchema schema = null;
 
-        public Builder() {}
+        public Builder() {
+        }
 
         public Builder expression(String expression) {
             this.expression = expression;
@@ -143,8 +145,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
         Parser parser = new Parser(scanner);
         Location loc = parser.location();
         String className = "TupleExpression" + counter.incrementAndGet();
-        setClassName(packageName + "." + className);
-        Java.CompilationUnit cu = makeCompilationUnit(parser);
+        Java.CompilationUnit cu = new Java.CompilationUnit(null);
         cu.setPackageDeclaration(new Java.PackageDeclaration(loc, packageName));
         Java.PackageMemberClassDeclaration cd = new Java.PackageMemberClassDeclaration(loc,
                 null,
@@ -152,14 +153,22 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
                 className,
                 null,
                 null,
-                new Java.Type[] {
+                new Java.Type[]{
                         classToType(loc, iface)
                 }
         );
         cu.addPackageMemberTypeDeclaration(cd);
         cd.addDeclaredMethod(generateFrontendMethod(loc));
         cd.addDeclaredMethod(generateBackendMethod(parser));
-        this.evaluatorClass = compileToClass(cu);
+        cook(cu);
+        try {
+            this.evaluatorClass = getClassLoader().loadClass(packageName + "." + className);
+        } catch (ClassNotFoundException ex) {
+            throw new InternalCompilerException(
+                    "SNO: Generated compilation unit does not declare class '" + packageName + "." + className + "'",
+                    ex
+            );
+        }
         this.evaluator = evaluatorClass.getConstructor().newInstance();
     }
 
@@ -196,7 +205,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
         Location loc = parser.location();
         List<Java.BlockStatement> statements = new ArrayList<>();
         Java.Rvalue[] exprs = parser.parseExpressionList();
-        for (int i=0; i<exprs.length; i++) {
+        for (int i = 0; i < exprs.length; i++) {
             if (i == exprs.length - 1) {
                 statements.add(maybeGenerateReturn(loc, exprs[i]));
             } else {
@@ -228,7 +237,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
     private Java.FunctionDeclarator.FormalParameters generateArgs(Location loc, Class<?> c) {
         return new Java.FunctionDeclarator.FormalParameters(
                 loc,
-                new Java.FunctionDeclarator.FormalParameter[] {
+                new Java.FunctionDeclarator.FormalParameter[]{
                         new Java.FunctionDeclarator.FormalParameter(
                                 loc,
                                 new Java.AccessModifier[]{new Java.AccessModifier(PUBLIC, loc)},
@@ -242,15 +251,20 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof TupleExpressionGenerator)) return false;
-        if (!super.equals(o)) return false;
         TupleExpressionGenerator that = (TupleExpressionGenerator) o;
-        return Objects.equals(expression, that.expression) && Objects.equals(schema, that.schema) && Objects.equals(evaluatorClass, that.evaluatorClass) && Objects.equals(evaluator, that.evaluator) && Objects.equals(iface, that.iface) && Objects.equals(returnType, that.returnType);
+        return Objects.equals(expression, that.expression) 
+                && Objects.equals(schema, that.schema) 
+                && Objects.equals(evaluatorClass, that.evaluatorClass) 
+                && Objects.equals(evaluator, that.evaluator) 
+                && Objects.equals(iface, that.iface) 
+                && Objects.equals(returnType, that.returnType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), expression, schema, evaluatorClass, evaluator, iface, returnType);
+        return Objects.hash(expression, schema, evaluatorClass, evaluator, iface, returnType);
     }
 
     public Object evaluator() {

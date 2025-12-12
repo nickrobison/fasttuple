@@ -2,14 +2,17 @@ package com.nickrobison.tuple.codegen;
 
 import com.nickrobison.tuple.FastTuple;
 import org.codehaus.commons.compiler.CompileException;
+import org.codehaus.commons.compiler.InternalCompilerException;
 import org.codehaus.commons.compiler.Location;
-import org.codehaus.janino.ClassBodyEvaluator;
 import org.codehaus.janino.Java;
 import org.codehaus.janino.Java.AbstractCompilationUnit.SingleTypeImportDeclaration;
+import org.codehaus.janino.SimpleCompiler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.nickrobison.tuple.codegen.CodegenUtil.nullConstructor;
@@ -18,7 +21,7 @@ import static java.lang.Character.toUpperCase;
 /**
  * Created by cliff on 5/3/14.
  */
-public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
+public abstract class TupleCodeGenerator extends SimpleCompiler {
     public static final String VALUE = "value";
     public static final String INDEX = "index";
     private static final AtomicLong counter = new AtomicLong(0L);
@@ -43,14 +46,22 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         this.fieldNames = fieldNames.clone();
         this.fieldTypes = fieldTypes.clone();
         this.className = "FastTuple" + counter.getAndIncrement();
-        this.setClassName("com.nickrobison.tuple." + className);
         this.setParentClassLoader(this.getClass().getClassLoader());
     }
 
     protected abstract Java.FieldDeclaration[] generateFields();
 
     public Class<?> cookToClass() throws CompileException {
-        return compileToClass(makeCompilationUnit());
+        Java.CompilationUnit cu = makeCompilationUnit();
+        cook(cu);
+        try {
+            return getClassLoader().loadClass("com.nickrobison.tuple." + className);
+        } catch (ClassNotFoundException ex) {
+            throw new InternalCompilerException(
+                "SNO: Generated compilation unit does not declare class 'com.nickrobison.tuple." + className + "'",
+                ex
+            );
+        }
     }
 
     protected Java.CompilationUnit makeCompilationUnit() throws CompileException {
@@ -278,5 +289,21 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         } else {
             return new Java.ReferenceType(loc, new Java.NormalAnnotation[]{}, type.getCanonicalName().split("\\."), null);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TupleCodeGenerator)) return false;
+        TupleCodeGenerator that = (TupleCodeGenerator) o;
+        return Objects.equals(iface, that.iface)
+                && Objects.deepEquals(fieldNames, that.fieldNames)
+                && Objects.deepEquals(fieldTypes, that.fieldTypes)
+                && Objects.equals(className, that.className);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(iface, Arrays.hashCode(fieldNames), Arrays.hashCode(fieldTypes), className);
     }
 }

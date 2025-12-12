@@ -1,18 +1,20 @@
 package com.nickrobison.tuple.codegen;
 
 import com.nickrobison.tuple.FastTuple;
+import org.codehaus.commons.compiler.InternalCompilerException;
 import org.codehaus.commons.compiler.Location;
-import org.codehaus.janino.ClassBodyEvaluator;
 import org.codehaus.janino.Java;
+import org.codehaus.janino.SimpleCompiler;
 
 import java.util.Collections;
+import java.util.Objects;
 
 import static com.nickrobison.tuple.codegen.CodegenUtil.emptyParams;
 
 /**
  * Created by cliff on 5/14/14.
  */
-public class TupleAllocatorGenerator extends ClassBodyEvaluator {
+public class TupleAllocatorGenerator extends SimpleCompiler {
     private static final String packageName = "com.nickrobison.tuple";
 
     public interface TupleAllocator {
@@ -22,14 +24,21 @@ public class TupleAllocatorGenerator extends ClassBodyEvaluator {
     private final Class<?> allocatorClass;
 
     public TupleAllocatorGenerator(Class<?> tupleClass) throws Exception {
-        setParentClassLoader(tupleClass.getClassLoader());
         String className = tupleClass.getName() + "Allocator";
-        setClassName(packageName + "." + className);
+        setParentClassLoader(tupleClass.getClassLoader());
         Java.CompilationUnit cu = new Java.CompilationUnit(null);
         Location loc = new Location(null, (short) 0, (short) 0);
         cu.setPackageDeclaration(new Java.PackageDeclaration(loc, packageName));
         cu.addPackageMemberTypeDeclaration(makeClassDefinition(loc, tupleClass, className));
-        allocatorClass = compileToClass(cu);
+        cook(cu);
+        try {
+            allocatorClass = getClassLoader().loadClass(packageName + "." + className);
+        } catch (ClassNotFoundException ex) {
+            throw new InternalCompilerException(
+                    "SNO: Generated compilation unit does not declare class '" + packageName + "." + className + "'",
+                    ex
+            );
+        }
     }
 
     public TupleAllocator createAllocator() throws Exception {
@@ -69,5 +78,18 @@ public class TupleAllocatorGenerator extends ClassBodyEvaluator {
         ));
 
         return cd;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TupleAllocatorGenerator)) return false;
+        TupleAllocatorGenerator that = (TupleAllocatorGenerator) o;
+        return Objects.equals(allocatorClass, that.allocatorClass);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(allocatorClass);
     }
 }
