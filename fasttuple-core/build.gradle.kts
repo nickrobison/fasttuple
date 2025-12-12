@@ -1,10 +1,8 @@
-import net.researchgate.release.ReleaseExtension
-
 plugins {
     signing
     `maven-publish`
     id("info.solidsoft.pitest")
-    id("net.researchgate.release")
+    id("org.jreleaser")
 }
 
 val junitVersion = "5.12.1"
@@ -36,26 +34,26 @@ tasks.jar {
 }
 
 val isRelease = !version.toString().endsWith("SNAPSHOT")
+
 publishing {
     publications {
-        create<MavenPublication>("mavenJava") {
+        create<MavenPublication>("maven") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+            
+            from(components["java"])
+            
             pom {
                 name.set(project.name)
                 description.set(project.description)
                 url.set("https://github.com/nickrobison/fasttuple")
+                inceptionYear.set("2014")
 
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
                         url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-
-                scm {
-                    scm {
-                        connection.set("git@github.com:nickrobison/fasttuple.git")
-                        developerConnection.set("git@github.com:nickrobison/fasttuple.git")
-                        url.set("https://github.com:nickrobison/fasttuple")
                     }
                 }
 
@@ -76,23 +74,24 @@ publishing {
                         email.set("philip@boundary.com")
                     }
                 }
+
+                scm {
+                    connection.set("scm:git:git@github.com:nickrobison/fasttuple.git")
+                    developerConnection.set("scm:git:git@github.com:nickrobison/fasttuple.git")
+                    url.set("https://github.com/nickrobison/fasttuple")
+                }
+
+                issueManagement {
+                    system.set("GitHub")
+                    url.set("https://github.com/nickrobison/fasttuple/issues")
+                }
             }
-            from(components["java"])
         }
     }
 
     repositories {
         maven {
-            credentials {
-                val sonatypeUsername: String? by project
-                val sonatypePassword: String? by project
-                username = sonatypeUsername ?: System.getenv("MAVEN_USER")
-                password = sonatypePassword ?: System.getenv("MAVEN_PASSWORD")
-            }
-            val releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-            val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
-            url = uri(if (isRelease) releasesRepoUrl else snapshotsRepoUrl)
-            name = "maven-central"
+            url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
         }
     }
 }
@@ -101,13 +100,45 @@ signing {
     isRequired = isRelease
     useGpgCmd()
     if (isRequired) {
-        sign(publishing.publications["mavenJava"])
+        sign(publishing.publications["maven"])
     }
 }
 
-configure<ReleaseExtension> {
-    with(git) {
-        requireBranch = "master"
-        signTag = true
+jreleaser {
+    project {
+        name.set("fasttuple")
+        description.set(project.description)
+        authors.set(listOf("Nick Robison", "Cliff Moon", "Philip Warren"))
+        license.set("Apache-2.0")
+        inceptionYear.set("2014")
+        links {
+            homepage.set("https://github.com/nickrobison/fasttuple")
+        }
+    }
+
+    gitRootSearch.set(true)
+
+    signing {
+        active.set(org.jreleaser.model.Active.ALWAYS)
+        armored.set(true)
+        mode.set(org.jreleaser.model.Signing.Mode.COMMAND)
+    }
+
+    deploy {
+        maven {
+            mavenCentral {
+                create("sonatype") {
+                    active.set(org.jreleaser.model.Active.ALWAYS)
+                    url.set("https://central.sonatype.com/api/v1/publisher")
+                    stagingRepository(layout.buildDirectory.dir("staging-deploy").get().asFile.path)
+                    
+                    // Credentials from environment or project properties
+                    val sonatypeUsername: String? by project
+                    val sonatypePassword: String? by project
+                    username.set(sonatypeUsername ?: System.getenv("MAVEN_USER"))
+                    password.set(sonatypePassword ?: System.getenv("MAVEN_PASSWORD"))
+                }
+            }
+        }
     }
 }
