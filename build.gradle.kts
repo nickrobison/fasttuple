@@ -42,7 +42,12 @@ allprojects {
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
         options.compilerArgs.add("-parameters")
-        options.errorprone.disableWarningsInGeneratedCode = true
+        options.compilerArgs.add("-Werror") // Treat warnings as errors
+        options.errorprone {
+            disableWarningsInGeneratedCode = true
+            // Exclude JMH generated code from ErrorProne checks
+            excludedPaths = ".*/build/generated/sources/annotationProcessor/.*"
+        }
     }
 
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {

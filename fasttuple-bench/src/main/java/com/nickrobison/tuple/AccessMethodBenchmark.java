@@ -83,7 +83,7 @@ public class AccessMethodBenchmark {
             mhgb = new ConstantCallSite(lookup.findGetter(Container.class, "b", Integer.TYPE));
             mhgc = new ConstantCallSite(lookup.findGetter(Container.class, "c", Short.TYPE));
         } catch (Exception ignored) {
-
+            // Benchmark setup - exceptions are expected and can be safely ignored
         }
     }
 

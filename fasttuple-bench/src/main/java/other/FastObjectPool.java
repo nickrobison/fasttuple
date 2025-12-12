@@ -25,6 +25,7 @@ public class FastObjectPool<T> {
     private final long ASHIFT;
 
     public ReentrantLock lock = new ReentrantLock();
+    @SuppressWarnings("ThreadLocalUsage") // Benchmark code - intentionally non-static
     private ThreadLocal<Holder<T>> localValue = new ThreadLocal<>();
 
     @SuppressWarnings("unchecked")
@@ -118,7 +119,9 @@ public class FastObjectPool<T> {
                 return (Unsafe) theUnsafe.get(null);
             };
 
-            THE_UNSAFE = AccessController.doPrivileged(action);
+            @SuppressWarnings("removal") // Third-party benchmark code
+            Unsafe unsafe = AccessController.doPrivileged(action);
+            THE_UNSAFE = unsafe;
         } catch (Exception e) {
             throw new RuntimeException("Unable to load unsafe", e);
         }

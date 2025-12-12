@@ -255,10 +255,10 @@ public class DirectTupleSchema extends TupleSchema {
     }
 
     private static class Member {
-        public final int index;
-        public final int size;
+        final int index;
+        final int size;
 
-        public Member(int index, int size) {
+        Member(int index, int size) {
             this.index = index;
             this.size = size;
         }

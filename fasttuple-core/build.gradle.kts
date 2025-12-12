@@ -41,9 +41,9 @@ publishing {
             groupId = project.group.toString()
             artifactId = project.name
             version = project.version.toString()
-            
+
             from(components["java"])
-            
+
             pom {
                 name.set(project.name)
                 description.set(project.description)
@@ -91,7 +91,12 @@ publishing {
 
     repositories {
         maven {
-            url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
+            url =
+                layout.buildDirectory
+                    .dir("staging-deploy")
+                    .get()
+                    .asFile
+                    .toURI()
         }
     }
 }
@@ -111,7 +116,9 @@ val mavenCentralPassword = findProperty("sonatypePassword") as String? ?: System
 jreleaser {
     project {
         name.set("fasttuple")
-        description.set("FastTuple is a library for generating heterogeneous tuples of primitive types from a runtime defined schema without boxing.")
+        description.set(
+            "FastTuple is a library for generating heterogeneous tuples of primitive types from a runtime defined schema without boxing.",
+        )
         authors.set(listOf("Nick Robison", "Cliff Moon", "Philip Warren"))
         license.set("Apache-2.0")
         inceptionYear.set("2014")
@@ -134,7 +141,12 @@ jreleaser {
                 create("sonatype") {
                     active.set(org.jreleaser.model.Active.ALWAYS)
                     url.set("https://central.sonatype.com/api/v1/publisher")
-                    stagingRepository(layout.buildDirectory.dir("staging-deploy").get().asFile.path)
+                    stagingRepository(
+                        layout.buildDirectory
+                            .dir("staging-deploy")
+                            .get()
+                            .asFile.path,
+                    )
                     username.set(mavenCentralUsername)
                     password.set(mavenCentralPassword)
                 }
