@@ -14,7 +14,7 @@ import static com.nickrobison.tuple.codegen.CodegenUtil.emptyParams;
 /**
  * Created by cliff on 5/14/14.
  */
-public class TupleAllocatorGenerator {
+public class TupleAllocatorGenerator extends SimpleCompiler {
     private static final String packageName = "com.nickrobison.tuple";
 
     public interface TupleAllocator {
@@ -22,24 +22,17 @@ public class TupleAllocatorGenerator {
     }
 
     private final Class<?> allocatorClass;
-    private final SimpleCompilerWrapper sc = new SimpleCompilerWrapper();
-
-    private static class SimpleCompilerWrapper extends SimpleCompiler {
-        public Java.Type classToTypePublic(Location location, Class<?> clazz) {
-            return classToType(location, clazz);
-        }
-    }
 
     public TupleAllocatorGenerator(Class<?> tupleClass) throws Exception {
         String className = tupleClass.getName() + "Allocator";
-        sc.setParentClassLoader(tupleClass.getClassLoader());
+        setParentClassLoader(tupleClass.getClassLoader());
         Java.CompilationUnit cu = new Java.CompilationUnit(null);
         Location loc = new Location(null, (short) 0, (short) 0);
         cu.setPackageDeclaration(new Java.PackageDeclaration(loc, packageName));
         cu.addPackageMemberTypeDeclaration(makeClassDefinition(loc, tupleClass, className));
-        sc.cook(cu);
+        cook(cu);
         try {
-            allocatorClass = sc.getClassLoader().loadClass(packageName + "." + className);
+            allocatorClass = getClassLoader().loadClass(packageName + "." + className);
         } catch (ClassNotFoundException ex) {
             throw new InternalCompilerException(
                 "SNO: Generated compilation unit does not declare class '" + packageName + "." + className + "'",
@@ -61,7 +54,7 @@ public class TupleAllocatorGenerator {
                 null,
                 null,
                 new Java.Type[]{
-                        sc.classToTypePublic(loc, TupleAllocator.class)
+                        classToType(loc, TupleAllocator.class)
                 });
 
         cd.addDeclaredMethod(new Java.MethodDeclarator(
@@ -69,7 +62,7 @@ public class TupleAllocatorGenerator {
                 null,
                 new Java.AccessModifier[]{new Java.AccessModifier("public", loc)},
                 null,
-                sc.classToTypePublic(loc, FastTuple.class),
+                classToType(loc, FastTuple.class),
                 "allocate",
                 emptyParams(loc),
                 new Java.Type[0],

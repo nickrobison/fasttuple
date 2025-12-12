@@ -18,7 +18,7 @@ import static com.nickrobison.tuple.codegen.CodegenUtil.*;
 /**
  * Created by cliff on 5/12/14.
  */
-public class TupleExpressionGenerator extends ClassBodyEvaluator {
+public class TupleExpressionGenerator extends SimpleCompiler {
     public interface TupleExpression {
         void evaluate(FastTuple tuple);
     }
@@ -67,13 +67,6 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
     private Object evaluator;
     private final Class<?> iface;
     private final Class<?> returnType;
-    private final SimpleCompilerWrapper sc = new SimpleCompilerWrapper();
-
-    private static class SimpleCompilerWrapper extends SimpleCompiler {
-        public Java.Type classToTypePublic(Location location, Class<?> clazz) {
-            return classToType(location, clazz);
-        }
-    }
 
     public static Builder builder() {
         return new Builder();
@@ -142,7 +135,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
         this.expression = expression;
         this.iface = iface;
         this.returnType = returnType;
-        sc.setParentClassLoader(schema.getClassLoader());
+        setParentClassLoader(schema.getClassLoader());
         generateEvaluatorClass();
     }
 
@@ -160,15 +153,15 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
                 null,
                 null,
                 new Java.Type[] {
-                        sc.classToTypePublic(loc, iface)
+                        classToType(loc, iface)
                 }
         );
         cu.addPackageMemberTypeDeclaration(cd);
         cd.addDeclaredMethod(generateFrontendMethod(loc));
         cd.addDeclaredMethod(generateBackendMethod(parser));
-        sc.cook(cu);
+        cook(cu);
         try {
-            this.evaluatorClass = sc.getClassLoader().loadClass(packageName + "." + className);
+            this.evaluatorClass = getClassLoader().loadClass(packageName + "." + className);
         } catch (ClassNotFoundException ex) {
             throw new InternalCompilerException(
                 "SNO: Generated compilation unit does not declare class '" + packageName + "." + className + "'",
@@ -183,7 +176,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
                 null,
                 new Java.AccessModifier[]{new Java.AccessModifier(PUBLIC, loc)},
                 null,
-                sc.classToTypePublic(loc, returnType),
+                classToType(loc, returnType),
                 "evaluate",
                 generateArgs(loc, FastTuple.class),
                 new Java.Type[0],
@@ -223,7 +216,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
                 null,
                 new Java.AccessModifier[]{new Java.AccessModifier(PUBLIC, loc)},
                 null,
-                sc.classToTypePublic(loc, returnType),
+                classToType(loc, returnType),
                 "doEval",
                 generateArgs(loc, schema.tupleClass()),
                 new Java.Type[0],
@@ -247,7 +240,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
                         new Java.FunctionDeclarator.FormalParameter(
                                 loc,
                                 new Java.AccessModifier[]{new Java.AccessModifier(PUBLIC, loc)},
-                                sc.classToTypePublic(loc, c),
+                                classToType(loc, c),
                                 "tuple"
                         )
                 },
