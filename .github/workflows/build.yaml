@@ -7,6 +7,10 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read       # Required for checkout
+  pull-requests: read  # Required for Sonar PR analysis
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

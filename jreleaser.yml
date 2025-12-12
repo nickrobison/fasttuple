@@ -1,0 +1,51 @@
+project:
+  name: fasttuple
+  description: FastTuple is a library for generating heterogeneous tuples of primitive types from a runtime defined schema without boxing.
+  longDescription: |
+    There are lots of good things about working on the JVM, like a world class JIT, operating system threads, 
+    and a world class garbage collector. However, one limiting factor can often be the interaction between 
+    primitive types and referenced types in Java. FastTuple generates heterogeneous collections of primitive 
+    values and ensures as best it can that they will be laid out adjacently in memory.
+  links:
+    homepage: https://github.com/nickrobison/fasttuple
+  authors:
+    - Nick Robison
+    - Cliff Moon
+    - Philip Warren
+  license: Apache-2.0
+  inceptionYear: 2014
+  java:
+    groupId: com.nickrobison
+    version: 11
+    multiProject: true
+
+release:
+  github:
+    overwrite: true
+    draft: false
+    sign: true
+    releaseName: '{{projectVersion}}'
+    skipTag: false
+    skipRelease: false
+    branch: master
+    changelog:
+      formatted: ALWAYS
+      preset: conventional-commits
+      contributors:
+        format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
+
+signing:
+  active: ALWAYS
+  armored: true
+  mode: COMMAND
+
+deploy:
+  maven:
+    mavenCentral:
+      sonatype:
+        active: ALWAYS
+        url: https://central.sonatype.com/api/v1/publisher
+        closeRepository: true
+        releaseRepository: true
+        stagingRepositories:
+          - fasttuple-core/build/staging-deploy
