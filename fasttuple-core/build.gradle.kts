@@ -4,7 +4,6 @@ plugins {
     signing
     `maven-publish`
     id("info.solidsoft.pitest")
-    id("com.gradleup.shadow")
     id("net.researchgate.release")
 }
 
@@ -29,13 +28,6 @@ configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
 tasks.test {
     useJUnitPlatform()
 }
-
-tasks.shadowJar {
-    archiveClassifier = ""
-    relocate("org.codehaus.janino", "shadow.janino")
-}
-
-
 
 tasks.jar {
     manifest {
@@ -85,7 +77,7 @@ publishing {
                     }
                 }
             }
-            from(components["shadow"])
+            from(components["java"])
         }
     }
 
