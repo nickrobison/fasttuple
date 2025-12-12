@@ -1,9 +1,11 @@
 package com.nickrobison.tuple.codegen;
 
 import com.nickrobison.tuple.FastTuple;
+import org.codehaus.commons.compiler.InternalCompilerException;
 import org.codehaus.commons.compiler.Location;
 import org.codehaus.janino.ClassBodyEvaluator;
 import org.codehaus.janino.Java;
+import org.codehaus.janino.SimpleCompiler;
 
 import java.util.Collections;
 
@@ -12,7 +14,7 @@ import static com.nickrobison.tuple.codegen.CodegenUtil.emptyParams;
 /**
  * Created by cliff on 5/14/14.
  */
-public class TupleAllocatorGenerator extends ClassBodyEvaluator {
+public class TupleAllocatorGenerator {
     private static final String packageName = "com.nickrobison.tuple";
 
     public interface TupleAllocator {
@@ -20,16 +22,30 @@ public class TupleAllocatorGenerator extends ClassBodyEvaluator {
     }
 
     private final Class<?> allocatorClass;
+    private final SimpleCompilerWrapper sc = new SimpleCompilerWrapper();
+
+    private static class SimpleCompilerWrapper extends SimpleCompiler {
+        public Java.Type classToTypePublic(Location location, Class<?> clazz) {
+            return classToType(location, clazz);
+        }
+    }
 
     public TupleAllocatorGenerator(Class<?> tupleClass) throws Exception {
-        setParentClassLoader(tupleClass.getClassLoader());
         String className = tupleClass.getName() + "Allocator";
-        setClassName(packageName + "." + className);
+        sc.setParentClassLoader(tupleClass.getClassLoader());
         Java.CompilationUnit cu = new Java.CompilationUnit(null);
         Location loc = new Location(null, (short) 0, (short) 0);
         cu.setPackageDeclaration(new Java.PackageDeclaration(loc, packageName));
         cu.addPackageMemberTypeDeclaration(makeClassDefinition(loc, tupleClass, className));
-        allocatorClass = compileToClass(cu);
+        sc.cook(cu);
+        try {
+            allocatorClass = sc.getClassLoader().loadClass(packageName + "." + className);
+        } catch (ClassNotFoundException ex) {
+            throw new InternalCompilerException(
+                "SNO: Generated compilation unit does not declare class '" + packageName + "." + className + "'",
+                ex
+            );
+        }
     }
 
     public TupleAllocator createAllocator() throws Exception {
@@ -45,7 +61,7 @@ public class TupleAllocatorGenerator extends ClassBodyEvaluator {
                 null,
                 null,
                 new Java.Type[]{
-                        classToType(loc, TupleAllocator.class)
+                        sc.classToTypePublic(loc, TupleAllocator.class)
                 });
 
         cd.addDeclaredMethod(new Java.MethodDeclarator(
@@ -53,7 +69,7 @@ public class TupleAllocatorGenerator extends ClassBodyEvaluator {
                 null,
                 new Java.AccessModifier[]{new Java.AccessModifier("public", loc)},
                 null,
-                classToType(loc, FastTuple.class),
+                sc.classToTypePublic(loc, FastTuple.class),
                 "allocate",
                 emptyParams(loc),
                 new Java.Type[0],

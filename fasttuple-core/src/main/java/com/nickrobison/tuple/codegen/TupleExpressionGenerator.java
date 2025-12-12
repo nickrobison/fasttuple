@@ -2,6 +2,7 @@ package com.nickrobison.tuple.codegen;
 
 import com.nickrobison.tuple.FastTuple;
 import com.nickrobison.tuple.TupleSchema;
+import org.codehaus.commons.compiler.InternalCompilerException;
 import org.codehaus.commons.compiler.Location;
 import org.codehaus.janino.*;
 
@@ -66,6 +67,13 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
     private Object evaluator;
     private final Class<?> iface;
     private final Class<?> returnType;
+    private final SimpleCompilerWrapper sc = new SimpleCompilerWrapper();
+
+    private static class SimpleCompilerWrapper extends SimpleCompiler {
+        public Java.Type classToTypePublic(Location location, Class<?> clazz) {
+            return classToType(location, clazz);
+        }
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -134,7 +142,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
         this.expression = expression;
         this.iface = iface;
         this.returnType = returnType;
-        setParentClassLoader(schema.getClassLoader());
+        sc.setParentClassLoader(schema.getClassLoader());
         generateEvaluatorClass();
     }
 
@@ -143,8 +151,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
         Parser parser = new Parser(scanner);
         Location loc = parser.location();
         String className = "TupleExpression" + counter.incrementAndGet();
-        setClassName(packageName + "." + className);
-        Java.CompilationUnit cu = makeCompilationUnit(parser);
+        Java.CompilationUnit cu = new Java.CompilationUnit(null);
         cu.setPackageDeclaration(new Java.PackageDeclaration(loc, packageName));
         Java.PackageMemberClassDeclaration cd = new Java.PackageMemberClassDeclaration(loc,
                 null,
@@ -153,13 +160,21 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
                 null,
                 null,
                 new Java.Type[] {
-                        classToType(loc, iface)
+                        sc.classToTypePublic(loc, iface)
                 }
         );
         cu.addPackageMemberTypeDeclaration(cd);
         cd.addDeclaredMethod(generateFrontendMethod(loc));
         cd.addDeclaredMethod(generateBackendMethod(parser));
-        this.evaluatorClass = compileToClass(cu);
+        sc.cook(cu);
+        try {
+            this.evaluatorClass = sc.getClassLoader().loadClass(packageName + "." + className);
+        } catch (ClassNotFoundException ex) {
+            throw new InternalCompilerException(
+                "SNO: Generated compilation unit does not declare class '" + packageName + "." + className + "'",
+                ex
+            );
+        }
         this.evaluator = evaluatorClass.getConstructor().newInstance();
     }
 
@@ -168,7 +183,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
                 null,
                 new Java.AccessModifier[]{new Java.AccessModifier(PUBLIC, loc)},
                 null,
-                classToType(loc, returnType),
+                sc.classToTypePublic(loc, returnType),
                 "evaluate",
                 generateArgs(loc, FastTuple.class),
                 new Java.Type[0],
@@ -208,7 +223,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
                 null,
                 new Java.AccessModifier[]{new Java.AccessModifier(PUBLIC, loc)},
                 null,
-                classToType(loc, returnType),
+                sc.classToTypePublic(loc, returnType),
                 "doEval",
                 generateArgs(loc, schema.tupleClass()),
                 new Java.Type[0],
@@ -232,7 +247,7 @@ public class TupleExpressionGenerator extends ClassBodyEvaluator {
                         new Java.FunctionDeclarator.FormalParameter(
                                 loc,
                                 new Java.AccessModifier[]{new Java.AccessModifier(PUBLIC, loc)},
-                                classToType(loc, c),
+                                sc.classToTypePublic(loc, c),
                                 "tuple"
                         )
                 },

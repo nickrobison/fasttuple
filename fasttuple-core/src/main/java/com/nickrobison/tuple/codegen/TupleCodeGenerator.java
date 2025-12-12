@@ -2,10 +2,12 @@ package com.nickrobison.tuple.codegen;
 
 import com.nickrobison.tuple.FastTuple;
 import org.codehaus.commons.compiler.CompileException;
+import org.codehaus.commons.compiler.InternalCompilerException;
 import org.codehaus.commons.compiler.Location;
 import org.codehaus.janino.ClassBodyEvaluator;
 import org.codehaus.janino.Java;
 import org.codehaus.janino.Java.AbstractCompilationUnit.SingleTypeImportDeclaration;
+import org.codehaus.janino.SimpleCompiler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +20,7 @@ import static java.lang.Character.toUpperCase;
 /**
  * Created by cliff on 5/3/14.
  */
-public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
+public abstract class TupleCodeGenerator {
     public static final String VALUE = "value";
     public static final String INDEX = "index";
     private static final AtomicLong counter = new AtomicLong(0L);
@@ -36,6 +38,21 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
     protected final Class<?>[] fieldTypes;
     protected final Location loc;
     protected final String className;
+    protected final SimpleCompilerWrapper sc = new SimpleCompilerWrapper();
+
+    protected static class SimpleCompilerWrapper extends SimpleCompiler {
+        public Java.Type classToTypePublic(Location location, Class<?> clazz) {
+            return classToType(location, clazz);
+        }
+
+        public Java.Type[] classesToTypesPublic(Location location, Class<?>[] classes) {
+            return classesToTypes(location, classes);
+        }
+    }
+
+    protected Java.Type classToType(Location location, Class<?> clazz) {
+        return sc.classToTypePublic(location, clazz);
+    }
 
     protected TupleCodeGenerator(Class<?> iface, String[] fieldNames, Class<?>[] fieldTypes) {
         this.loc = new Location("", (short) 0, (short) 0);
@@ -43,14 +60,22 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
         this.fieldNames = fieldNames.clone();
         this.fieldTypes = fieldTypes.clone();
         this.className = "FastTuple" + counter.getAndIncrement();
-        this.setClassName("com.nickrobison.tuple." + className);
-        this.setParentClassLoader(this.getClass().getClassLoader());
+        this.sc.setParentClassLoader(this.getClass().getClassLoader());
     }
 
     protected abstract Java.FieldDeclaration[] generateFields();
 
     public Class<?> cookToClass() throws CompileException {
-        return compileToClass(makeCompilationUnit());
+        Java.CompilationUnit cu = makeCompilationUnit();
+        sc.cook(cu);
+        try {
+            return sc.getClassLoader().loadClass("com.nickrobison.tuple." + className);
+        } catch (ClassNotFoundException ex) {
+            throw new InternalCompilerException(
+                "SNO: Generated compilation unit does not declare class 'com.nickrobison.tuple." + className + "'",
+                ex
+            );
+        }
     }
 
     protected Java.CompilationUnit makeCompilationUnit() throws CompileException {
@@ -69,8 +94,8 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                 new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, cuLoc)},
                 className,
                 null, //type parameters
-                classToType(cuLoc, FastTuple.class), //class to extend
-                classesToTypes(cuLoc, ifaces)
+                sc.classToTypePublic(cuLoc, FastTuple.class), //class to extend
+                sc.classesToTypesPublic(cuLoc, ifaces)
         );
         cu.addPackageMemberTypeDeclaration(cd);
         for (Java.FieldDeclaration dec : generateFields()) {
@@ -104,10 +129,10 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                 null,
                 new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)},
                 null,
-                classToType(loc, Object.class),
+                sc.classToTypePublic(loc, Object.class),
                 "get",
                 new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{
-                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, classToType(loc, Integer.TYPE), INDEX)}, false),
+                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, sc.classToTypePublic(loc, Integer.TYPE), INDEX)}, false),
                 new Java.Type[]{},
                 null,
                 Collections.singletonList(
@@ -168,11 +193,11 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                 null,
                 new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)},
                 null,
-                classToType(loc, Void.TYPE),
+                sc.classToTypePublic(loc, Void.TYPE),
                 "set",
                 new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{
-                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, classToType(loc, Integer.TYPE), INDEX),
-                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, classToType(loc, Object.class), VALUE)
+                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, sc.classToTypePublic(loc, Integer.TYPE), INDEX),
+                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, sc.classToTypePublic(loc, Object.class), VALUE)
                 }, false),
                 new Java.Type[]{},
                 null,
@@ -198,7 +223,7 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                 null,
                 new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)},
                 null,
-                classToType(loc, type),
+                sc.classToTypePublic(loc, type),
                 name,
                 new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{}, false),
                 new Java.Type[]{},
@@ -214,10 +239,10 @@ public abstract class TupleCodeGenerator extends ClassBodyEvaluator {
                 null,
                 new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)},
                 null,
-                classToType(loc, Void.TYPE),
+                sc.classToTypePublic(loc, Void.TYPE),
                 name,
                 new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{
-                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, classToType(loc, type), VALUE)
+                        new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, sc.classToTypePublic(loc, type), VALUE)
                 }, false),
                 new Java.Type[]{},
                 null,
