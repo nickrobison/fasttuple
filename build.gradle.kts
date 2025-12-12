@@ -6,6 +6,7 @@ plugins {
     id("org.sonarqube") version "7.2.1.6560"
     id("info.solidsoft.pitest") version "1.15.0" apply(false)
     id("org.jreleaser") version "1.15.0" apply(false)
+    id("com.diffplug.spotless") version "7.0.2"
     id("net.ltgt.errorprone") version "4.1.0"
     id("com.gradleup.shadow") version "8.3.6" apply(false)
 }
@@ -19,6 +20,7 @@ allprojects {
     apply(plugin = "org.sonarqube")
     apply(plugin = "java-library")
     apply(plugin = "jacoco")
+    apply(plugin = "com.diffplug.spotless")
     apply(plugin = "net.ltgt.errorprone")
 
     repositories {
@@ -27,7 +29,6 @@ allprojects {
 
     dependencies {
         errorprone("com.google.errorprone:error_prone_core:${errorProneVersion}")
-
     }
 
     java {
@@ -38,8 +39,33 @@ allprojects {
     }
 
     tasks.withType<JavaCompile>().configureEach {
+        options.encoding = "UTF-8"
+        options.compilerArgs.add("-parameters")
         options.errorprone.disableWarningsInGeneratedCode = true
+    }
 
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        java {
+            target("src/**/*.java")
+            
+            // Use Palantir Java Format which is based on Google Java Format
+            // but more similar to IntelliJ defaults
+            palantirJavaFormat("2.50.0")
+            
+            // Remove unused imports
+            removeUnusedImports()
+            
+            // Trim trailing whitespace
+            trimTrailingWhitespace()
+            
+            // End files with newline
+            endWithNewline()
+        }
+        
+        kotlinGradle {
+            target("*.gradle.kts")
+            ktlint()
+        }
     }
 
     tasks.jacocoTestReport {
