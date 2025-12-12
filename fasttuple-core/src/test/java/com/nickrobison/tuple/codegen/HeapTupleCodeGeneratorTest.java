@@ -23,6 +23,7 @@ public class HeapTupleCodeGeneratorTest {
                 addField("e", Byte.TYPE).
                 addField("f", Float.TYPE).
                 addField("g", Double.TYPE).
+                addField("h", String.class).
                 heapMemory().
                 build();
 
@@ -36,6 +37,7 @@ public class HeapTupleCodeGeneratorTest {
         assertGetterAndSetterGenerated(clazz, "e", byte.class);
         assertGetterAndSetterGenerated(clazz, "f", float.class);
         assertGetterAndSetterGenerated(clazz, "g", double.class);
+        assertGetterAndSetterGenerated(clazz, "h", String.class);
     }
 
     @Test
@@ -48,6 +50,7 @@ public class HeapTupleCodeGeneratorTest {
                 addField("e", Byte.TYPE).
                 addField("f", Float.TYPE).
                 addField("g", Double.TYPE).
+                addField("h", String.class).
                 heapMemory().
                 build();
         FastTuple tuple = schema.createTuple();
@@ -58,6 +61,8 @@ public class HeapTupleCodeGeneratorTest {
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "e", Byte.TYPE, (byte)255);
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "f", Float.TYPE, 0.125f);
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "g", Double.TYPE, 0.125);
+        assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "h", String.class, "Hello, world!");
+
     }
 
     @Test
@@ -70,6 +75,7 @@ public class HeapTupleCodeGeneratorTest {
                 addField("e", Byte.TYPE).
                 addField("f", Float.TYPE).
                 addField("g", Double.TYPE).
+                addField("h", String.class).
                 heapMemory().
                 build();
         FastTuple tuple = schema.createTuple();
@@ -80,6 +86,7 @@ public class HeapTupleCodeGeneratorTest {
         assertIndexedGetterAndSetterRoundTrip(tuple, 5, (byte)255);
         assertIndexedGetterAndSetterRoundTrip(tuple, 6, 0.125f);
         assertIndexedGetterAndSetterRoundTrip(tuple, 7, 0.125);
+        assertIndexedGetterAndSetterRoundTrip(tuple, 8, "Hello, world!");
     }
 
     @Test
@@ -92,6 +99,7 @@ public class HeapTupleCodeGeneratorTest {
                 addField("e", Byte.TYPE).
                 addField("f", Float.TYPE).
                 addField("g", Double.TYPE).
+                addField("h", String.class).
                 heapMemory().
                 build();
         FastTuple tuple = schema.createTuple();
@@ -102,6 +110,7 @@ public class HeapTupleCodeGeneratorTest {
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 5, (byte)255);
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 6, 0.125f);
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 7, 0.125);
+        assertIndexedTypedGetterAndSetterRoundTrip(tuple, 8, "Hello, world!");
     }
 
     @Test
