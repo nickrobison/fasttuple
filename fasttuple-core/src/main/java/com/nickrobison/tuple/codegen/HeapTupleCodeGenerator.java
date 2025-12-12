@@ -121,6 +121,7 @@ public class HeapTupleCodeGenerator extends TupleCodeGenerator {
 
     @Override
     protected Java.Rvalue generateSetInvocation(Class<?> type, int index, String value) {
+        // TODO: Replace classToRefType with Janino
         return new Java.Assignment(loc, new Java.FieldAccessExpression(loc, new Java.ThisReference(loc), fieldNames[index]), "=",
                 new Java.Cast(loc, classToRefType(fieldTypes[index]), new Java.AmbiguousName(loc, new String[]{value})));
     }

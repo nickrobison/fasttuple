@@ -124,6 +124,17 @@ public class HeapTupleCodeGeneratorTest {
         assertInstanceOf(StaticBinding.class, tuple);
     }
 
+    @Test
+    public void testStringInterfaceIsImplemented() throws Exception {
+        TupleSchema schema = TupleSchema.builder().
+                addField("a", String.class).
+                implementInterface(StringBinding.class).
+                heapMemory().
+                build();
+        FastTuple tuple = schema.createTuple();
+        assertInstanceOf(StringBinding.class, tuple);
+    }
+
     public void assertGetterAndSetterGenerated(Class<?> clazz, String name, Class<?> type) throws Exception {
         assertEquals(type, clazz.getDeclaredMethod(name).getReturnType());
         assertNotNull(clazz.getDeclaredMethod(name, type));
@@ -178,5 +189,11 @@ public class HeapTupleCodeGeneratorTest {
     public interface StaticBinding {
         void a(long a);
         long a();
+    }
+
+    @SuppressWarnings("unused")
+    public interface StringBinding {
+        void a(String a);
+        String a();
     }
 }
