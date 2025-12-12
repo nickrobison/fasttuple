@@ -18,6 +18,10 @@ on:
     branches:
       - master
 
+permissions:
+  contents: write  # Required for creating releases and tags
+  actions: read    # Required for workflow_run trigger
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

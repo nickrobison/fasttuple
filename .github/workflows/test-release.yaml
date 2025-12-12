@@ -18,6 +18,9 @@ on:
           - 'true'
           - 'false'
 
+permissions:
+  contents: read  # Only needs to read repository contents
+
 jobs:
   test-release:
     runs-on: ubuntu-latest
