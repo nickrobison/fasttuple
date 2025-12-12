@@ -9,47 +9,7 @@ This directory contains GitHub Actions workflows for building, testing, and rele
 ### 1. Build and Test (`build.yaml`)
 Runs on every push and pull request to build the project and run tests.
 
-### 2. Test Release Configuration (`test-release.yaml`)
-**Purpose**: Validate JReleaser configuration without deploying
-
-**When it runs:**
-- Automatically on PRs that modify:
-  - `build.gradle.kts`
-  - `fasttuple-core/build.gradle.kts`
-  - `jreleaser.yml`
-  - Workflow files
-- Manually via workflow dispatch
-
-**What it does:**
-1. Builds the project
-2. Publishes to local staging directory
-3. Verifies all required artifacts exist:
-   - Main JAR
-   - Sources JAR
-   - Javadoc JAR
-   - POM file
-4. Validates POM content:
-   - Project metadata
-   - License information
-   - Developer information
-   - SCM configuration
-5. Tests JReleaser configuration
-6. Uploads artifacts and logs for inspection
-
-**How to run manually:**
-```bash
-# Via GitHub UI
-Actions → Test Release Configuration → Run workflow
-
-# Via GitHub CLI
-gh workflow run test-release.yaml
-```
-
-**Artifacts produced:**
-- `staging-artifacts` - All built JARs and POMs (7 days retention)
-- `jreleaser-logs` - JReleaser configuration and logs (7 days retention)
-
-### 3. Maven Deploy (`deploy.yaml`)
+### 2. Maven Deploy (`deploy.yaml`)
 **Purpose**: Deploy releases to Maven Central and create GitHub releases
 
 **When it runs:**
@@ -87,15 +47,12 @@ gh workflow run deploy.yaml -f dry-run=true
 **Artifacts produced:**
 - `jreleaser-logs` - JReleaser logs for debugging (30 days retention)
 
-### 4. Coverity (`coverity.yaml`)
+### 3. Coverity (`coverity.yaml`)
 Runs Coverity static analysis (if configured).
 
 ## Testing the Release Process
 
-### Step 1: Test Configuration (Safe)
-Create a PR with your changes and the `test-release.yaml` workflow will automatically run.
-
-### Step 2: Dry-Run Deployment (Safe)
+### Step 1: Dry-Run Deployment (Safe)
 Once merged to master, manually trigger the deploy workflow in dry-run mode:
 ```bash
 gh workflow run deploy.yaml -f dry-run=true
@@ -103,7 +60,7 @@ gh workflow run deploy.yaml -f dry-run=true
 
 This will simulate the entire release process without actually publishing.
 
-### Step 3: Real Deployment
+### Step 2: Real Deployment
 If dry-run succeeds, trigger the real deployment:
 ```bash
 # Either wait for automatic trigger after successful build
@@ -116,7 +73,7 @@ gh workflow run deploy.yaml -f dry-run=false
 ### View workflow logs
 ```bash
 # List recent workflow runs
-gh run list --workflow=test-release.yaml
+gh run list --workflow=deploy.yaml
 
 # View logs for a specific run
 gh run view <run-id> --log
@@ -166,15 +123,14 @@ gh run download <run-id> -n staging-artifacts
 │  Build & Test   │
 └────────┬────────┘
          │
-         ├──────────────────┐
-         │                  │
-         ▼                  ▼
-┌─────────────────┐  ┌──────────────────┐
-│ Test Release    │  │  Deploy (master) │
-│ Configuration   │  │                  │
-│ (on PR)         │  │  - Dry-run mode  │
-└─────────────────┘  │  - Full release  │
-                     └──────────────────┘
+         │ (on master)
+         ▼
+┌──────────────────┐
+│  Deploy          │
+│                  │
+│  - Dry-run mode  │
+│  - Full release  │
+└──────────────────┘
 ```
 
 ## Best Practices

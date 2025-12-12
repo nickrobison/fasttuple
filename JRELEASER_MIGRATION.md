@@ -51,7 +51,7 @@ Created a comprehensive JReleaser configuration file with:
   - Automatic repository closing and release
   - Staging from `fasttuple-core/build/staging-deploy`
 
-### 4. `.github/workflows/deploy.yaml`
+### 4. `.github/workflows/deploy.yaml` and `.github/workflows/build.yaml`
 Updated the deployment workflow:
 - Updated checkout action to v4 with full git history (`fetch-depth: 0`)
 - Added Gradle setup action for better caching
@@ -115,40 +115,21 @@ The new configuration maintains all the functionality of the old release plugin:
 - [x] Update `fasttuple-core/build.gradle.kts` to remove release plugin
 - [x] Configure JReleaser in `fasttuple-core/build.gradle.kts`
 - [x] Create `jreleaser.yml` configuration
-- [x] Update GitHub Actions workflow
+- [x] Update GitHub Actions workflows
+- [x] Add explicit permissions to workflows
 - [ ] Add GPG secrets to GitHub repository:
   - `GPG_PASSPHRASE`
   - `GPG_PUBLIC_KEY`
   - `GPG_SECRET_KEY`
 - [ ] Verify `MAVEN_USERNAME` and `MAVEN_PASSWORD` secrets still exist
-- [ ] Test release process with a snapshot version
+- [ ] Test release process with dry-run mode
 - [ ] Test full release process with a release version
 
 ## Testing the Migration
 
 ### Automated Testing in GitHub Actions
 
-We've created two workflows to test the JReleaser configuration:
-
-#### 1. Test Release Configuration (`.github/workflows/test-release.yaml`)
-This workflow runs automatically on PRs that modify release-related files. It:
-- ✅ Builds and stages artifacts locally
-- ✅ Verifies all required artifacts are created (JAR, sources, javadoc, POM)
-- ✅ Validates POM content (metadata, licenses, developers, SCM)
-- ✅ Tests JReleaser configuration without deploying
-- ✅ Uploads artifacts and logs for inspection
-
-**Trigger it manually:**
-```bash
-# Via GitHub UI: Actions → Test Release Configuration → Run workflow
-# Or via gh CLI:
-gh workflow run test-release.yaml
-```
-
-**Automatic triggers:**
-- Any PR that modifies `build.gradle.kts`, `jreleaser.yml`, or workflow files
-
-#### 2. Maven Deploy with Dry-Run Option (`.github/workflows/deploy.yaml`)
+#### Maven Deploy with Dry-Run Option (`.github/workflows/deploy.yaml`)
 The main deployment workflow now supports dry-run mode:
 
 **Test deployment without publishing:**
@@ -210,13 +191,12 @@ find fasttuple-core/build/staging-deploy/ -type f
 
 ### Inspecting Test Results
 
-After running the test workflow:
-1. Go to Actions → Test Release Configuration → Latest run
-2. Check the "Summary" section for a quick overview
+After running the deploy workflow in dry-run mode:
+1. Go to Actions → Maven Deploy → Latest run
+2. Check the step outputs for detailed information
 3. Download artifacts:
-   - `staging-artifacts` - Contains all built JARs and POMs
    - `jreleaser-logs` - Contains JReleaser configuration and logs
-4. Review the step outputs for detailed validation results
+4. Review the logs for any warnings or errors
 
 ## Rollback Plan
 
