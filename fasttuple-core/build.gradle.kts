@@ -104,10 +104,14 @@ signing {
     }
 }
 
+// Credentials for JReleaser
+val mavenCentralUsername = findProperty("sonatypeUsername") as String? ?: System.getenv("MAVEN_USER") ?: ""
+val mavenCentralPassword = findProperty("sonatypePassword") as String? ?: System.getenv("MAVEN_PASSWORD") ?: ""
+
 jreleaser {
     project {
         name.set("fasttuple")
-        description.set(project.description)
+        description.set("FastTuple is a library for generating heterogeneous tuples of primitive types from a runtime defined schema without boxing.")
         authors.set(listOf("Nick Robison", "Cliff Moon", "Philip Warren"))
         license.set("Apache-2.0")
         inceptionYear.set("2014")
@@ -131,12 +135,8 @@ jreleaser {
                     active.set(org.jreleaser.model.Active.ALWAYS)
                     url.set("https://central.sonatype.com/api/v1/publisher")
                     stagingRepository(layout.buildDirectory.dir("staging-deploy").get().asFile.path)
-                    
-                    // Credentials from environment or project properties
-                    val sonatypeUsername: String? by project
-                    val sonatypePassword: String? by project
-                    username.set(sonatypeUsername ?: System.getenv("MAVEN_USER"))
-                    password.set(sonatypePassword ?: System.getenv("MAVEN_PASSWORD"))
+                    username.set(mavenCentralUsername)
+                    password.set(mavenCentralPassword)
                 }
             }
         }
