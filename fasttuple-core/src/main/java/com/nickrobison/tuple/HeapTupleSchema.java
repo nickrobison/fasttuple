@@ -1,9 +1,9 @@
 package com.nickrobison.tuple;
 
+import java.lang.reflect.Array;
+
 import com.nickrobison.tuple.codegen.HeapTupleCodeGenerator;
 import com.nickrobison.tuple.codegen.TupleAllocatorGenerator;
-
-import java.lang.reflect.Array;
 
 /**
  * Created by cliff on 5/9/14.
@@ -46,7 +46,7 @@ public class HeapTupleSchema extends TupleSchema {
     @Override
     public FastTuple[] createTupleArray(int size) throws Exception {
         FastTuple[] tuples = new FastTuple[size];
-        for (int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             tuples[i] = createTuple();
         }
         return tuples;
@@ -57,7 +57,7 @@ public class HeapTupleSchema extends TupleSchema {
         // Use Array native method to create array
         // of a type only known at run time
         @SuppressWarnings("unchecked")
-        T[] tuples =  (T[]) Array.newInstance(clazz, size);
+        T[] tuples = (T[]) Array.newInstance(clazz, size);
         for (int i = 0; i < size; i++) {
             tuples[i] = createTypedTuple(clazz);
         }
@@ -66,21 +66,21 @@ public class HeapTupleSchema extends TupleSchema {
 
     @Override
     public void destroyTuple(FastTuple tuple) {
-        //noop
+        // noop
     }
 
     @Override
     public <T> void destroyTypedTuple(T tuple) {
-//        noop
+        // noop
     }
 
     @Override
     public void destroyTupleArray(FastTuple[] ary) {
-        //noop
+        // noop
     }
 
     @Override
     public <T> void destroyTypedTupleArray(T[] ary) {
-//        noop
+        // noop
     }
 }

@@ -19,18 +19,12 @@ public class TuplePool<T> {
     private final boolean createWhenExhausted;
     private volatile boolean closed = false;
 
-    public TuplePool(int size,
-                     boolean createWhenExhausted,
-                     Loader<T> loader,
-                     Destroyer<T> destroyer) {
+    public TuplePool(int size, boolean createWhenExhausted, Loader<T> loader, Destroyer<T> destroyer) {
         this(size, createWhenExhausted, loader, destroyer, null);
     }
 
-    public TuplePool(final int size,
-                     boolean createWhenExhausted,
-                     Loader<T> loader,
-                     Destroyer<T> destroyer,
-                     Initializer<T> initializer) {
+    public TuplePool(final int size, boolean createWhenExhausted, Loader<T> loader, Destroyer<T> destroyer,
+            Initializer<T> initializer) {
         this.size = 0;
         this.reloadSize = size;
         this.createWhenExhausted = createWhenExhausted;
@@ -101,6 +95,5 @@ public class TuplePool<T> {
         pool.remove();
         assert references.isEmpty();
     }
-
 
 }

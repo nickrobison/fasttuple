@@ -1,13 +1,14 @@
 package com.nickrobison.tuple;
 
-import com.nickrobison.tuple.codegen.DirectTupleCodeGenerator;
-import com.nickrobison.tuple.codegen.TupleAllocatorGenerator;
-import com.nickrobison.tuple.unsafe.Coterie;
-import sun.misc.Unsafe;
-
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Objects;
+
+import sun.misc.Unsafe;
+
+import com.nickrobison.tuple.codegen.DirectTupleCodeGenerator;
+import com.nickrobison.tuple.codegen.TupleAllocatorGenerator;
+import com.nickrobison.tuple.unsafe.Coterie;
 
 import static com.nickrobison.tuple.SizeOf.sizeOf;
 
@@ -33,11 +34,11 @@ public class DirectTupleSchema extends TupleSchema {
         }
 
         /**
-         * Pads out the size of each individual record such that it fits within a multiple of the wordSize.
-         * This is useful for eliminating false sharing when adjacent records are being utilized by different
-         * threads.
+         * Pads out the size of each individual record such that it fits within a multiple of the wordSize. This is
+         * useful for eliminating false sharing when adjacent records are being utilized by different threads.
          *
-         * @param wordSize - Word size to pad between tuples
+         * @param wordSize
+         *            - Word size to pad between tuples
          * @return - {@link Builder}
          */
         public Builder padToWordSize(int wordSize) {
@@ -232,16 +233,16 @@ public class DirectTupleSchema extends TupleSchema {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DirectTupleSchema)) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof DirectTupleSchema))
+            return false;
+        if (!super.equals(o))
+            return false;
         DirectTupleSchema that = (DirectTupleSchema) o;
-        return byteSize == that.byteSize &&
-                addressOffset == that.addressOffset &&
-                wordSize == that.wordSize &&
-                Arrays.equals(layout, that.layout) &&
-                Arrays.equals(widths, that.widths) &&
-                Objects.equals(allocator, that.allocator);
+        return byteSize == that.byteSize && addressOffset == that.addressOffset && wordSize == that.wordSize
+                && Arrays.equals(layout, that.layout) && Arrays.equals(widths, that.widths)
+                && Objects.equals(allocator, that.allocator);
     }
 
     @Override
@@ -254,10 +255,10 @@ public class DirectTupleSchema extends TupleSchema {
     }
 
     private static class Member {
-        public final int index;
-        public final int size;
+        final int index;
+        final int size;
 
-        public Member(int index, int size) {
+        Member(int index, int size) {
             this.index = index;
             this.size = size;
         }

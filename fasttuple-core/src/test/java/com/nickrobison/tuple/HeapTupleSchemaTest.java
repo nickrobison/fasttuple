@@ -15,16 +15,9 @@ public class HeapTupleSchemaTest {
 
     @Test
     public void createTupleArrayTest() throws Exception {
-        HeapTupleSchema schema = TupleSchema.builder().
-                addField("aByte", Byte.TYPE).
-                addField("aChar", Character.TYPE).
-                addField("aInt", Integer.TYPE).
-                addField("aShort", Short.TYPE).
-                addField("aFloat", Float.TYPE).
-                addField("aLong", Long.TYPE).
-                addField("aDouble", Double.TYPE).
-                heapMemory().
-                build();
+        HeapTupleSchema schema = TupleSchema.builder().addField("aByte", Byte.TYPE).addField("aChar", Character.TYPE)
+                .addField("aInt", Integer.TYPE).addField("aShort", Short.TYPE).addField("aFloat", Float.TYPE)
+                .addField("aLong", Long.TYPE).addField("aDouble", Double.TYPE).heapMemory().build();
 
         FastTuple[] tuples = schema.createTupleArray(10);
         assertEquals(10, tuples.length);
@@ -52,17 +45,10 @@ public class HeapTupleSchemaTest {
 
     @Test
     public void createTypedTupleArrayTest() throws Exception {
-        HeapTupleSchema schema = TupleSchema.builder().
-                addField("aByte", Byte.TYPE).
-                addField("aChar", Character.TYPE).
-                addField("aInt", Integer.TYPE).
-                addField("aShort", Short.TYPE).
-                addField("aFloat", Float.TYPE).
-                addField("aLong", Long.TYPE).
-                addField("aDouble", Double.TYPE).
-                implementInterface(TypedTuple.class).
-                heapMemory().
-                build();
+        HeapTupleSchema schema = TupleSchema.builder().addField("aByte", Byte.TYPE).addField("aChar", Character.TYPE)
+                .addField("aInt", Integer.TYPE).addField("aShort", Short.TYPE).addField("aFloat", Float.TYPE)
+                .addField("aLong", Long.TYPE).addField("aDouble", Double.TYPE).implementInterface(TypedTuple.class)
+                .heapMemory().build();
 
         TypedTuple[] tuples = schema.createTypedTupleArray(TypedTuple.class, 10);
         assertEquals(10, tuples.length);

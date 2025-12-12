@@ -3,6 +3,7 @@ package com.nickrobison.tuple.codegen;
 import com.nickrobison.tuple.DirectTupleSchema;
 import com.nickrobison.tuple.FastTuple;
 import com.nickrobison.tuple.TupleSchema;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,18 +15,12 @@ public class DirectTupleCodeGeneratorTest {
 
     @Test
     public void testAccessorsGetGenerated() throws Exception {
-        DirectTupleSchema schema = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                addField("b", Integer.TYPE).
-                addField("c", Short.TYPE).
-                addField("d", Character.TYPE).
-                addField("e", Byte.TYPE).
-                addField("f", Float.TYPE).
-                addField("g", Double.TYPE).
-                directMemory().
-                build();
+        DirectTupleSchema schema = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Integer.TYPE)
+                .addField("c", Short.TYPE).addField("d", Character.TYPE).addField("e", Byte.TYPE)
+                .addField("f", Float.TYPE).addField("g", Double.TYPE).directMemory().build();
 
-        DirectTupleCodeGenerator codegen = new DirectTupleCodeGenerator(null, schema.getFieldNames(), schema.getFieldTypes(), schema.getLayout());
+        DirectTupleCodeGenerator codegen = new DirectTupleCodeGenerator(null, schema.getFieldNames(),
+                schema.getFieldTypes(), schema.getLayout());
         Class<?> clazz = codegen.cookToClass();
         assertGetterAndSetterGenerated(clazz, "a", long.class);
         assertGetterAndSetterGenerated(clazz, "b", int.class);
@@ -38,60 +33,39 @@ public class DirectTupleCodeGeneratorTest {
 
     @Test
     public void testAccessorsWork() throws Exception {
-        TupleSchema schema = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                addField("b", Integer.TYPE).
-                addField("c", Short.TYPE).
-                addField("d", Character.TYPE).
-                addField("e", Byte.TYPE).
-                addField("f", Float.TYPE).
-                addField("g", Double.TYPE).
-                directMemory().
-                build();
+        TupleSchema schema = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Integer.TYPE)
+                .addField("c", Short.TYPE).addField("d", Character.TYPE).addField("e", Byte.TYPE)
+                .addField("f", Float.TYPE).addField("g", Double.TYPE).directMemory().build();
         FastTuple tuple = schema.createTuple();
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "a", Long.TYPE, 100L);
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "b", Integer.TYPE, 40);
-        assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "c", Short.TYPE, (short)10);
+        assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "c", Short.TYPE, (short) 10);
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "d", Character.TYPE, 'j');
-        assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "e", Byte.TYPE, (byte)255);
+        assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "e", Byte.TYPE, (byte) 255);
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "f", Float.TYPE, 0.125f);
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "g", Double.TYPE, 0.125);
     }
 
     @Test
     public void testIndexedSetAndGet() throws Exception {
-        TupleSchema schema = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                addField("b", Integer.TYPE).
-                addField("c", Short.TYPE).
-                addField("d", Character.TYPE).
-                addField("e", Byte.TYPE).
-                addField("f", Float.TYPE).
-                addField("g", Double.TYPE).
-                directMemory().
-                build();
+        TupleSchema schema = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Integer.TYPE)
+                .addField("c", Short.TYPE).addField("d", Character.TYPE).addField("e", Byte.TYPE)
+                .addField("f", Float.TYPE).addField("g", Double.TYPE).directMemory().build();
         FastTuple tuple = schema.createTuple();
         assertIndexedGetterAndSetterRoundTrip(tuple, 1, 100L);
         assertIndexedGetterAndSetterRoundTrip(tuple, 2, 40);
-        assertIndexedGetterAndSetterRoundTrip(tuple, 3, (short)10);
+        assertIndexedGetterAndSetterRoundTrip(tuple, 3, (short) 10);
         assertIndexedGetterAndSetterRoundTrip(tuple, 4, 'j');
-        assertIndexedGetterAndSetterRoundTrip(tuple, 5, (byte)255);
+        assertIndexedGetterAndSetterRoundTrip(tuple, 5, (byte) 255);
         assertIndexedGetterAndSetterRoundTrip(tuple, 6, 0.125f);
         assertIndexedGetterAndSetterRoundTrip(tuple, 7, 0.125);
     }
 
     @Test
     public void testIndexedTypedSetAndGet() throws Exception {
-        TupleSchema schema = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                addField("b", Integer.TYPE).
-                addField("c", Short.TYPE).
-                addField("d", Character.TYPE).
-                addField("e", Byte.TYPE).
-                addField("f", Float.TYPE).
-                addField("g", Double.TYPE).
-                directMemory().
-                build();
+        TupleSchema schema = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Integer.TYPE)
+                .addField("c", Short.TYPE).addField("d", Character.TYPE).addField("e", Byte.TYPE)
+                .addField("f", Float.TYPE).addField("g", Double.TYPE).directMemory().build();
         FastTuple tuple = schema.createTuple();
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 1, 100L);
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 2, 40);
@@ -104,21 +78,17 @@ public class DirectTupleCodeGeneratorTest {
 
     @Test
     public void testUnsupportedType() {
-        final DirectTupleSchema.Builder builder = TupleSchema.builder().
-                addField("a", Void.TYPE).
-                directMemory();
+        final DirectTupleSchema.Builder builder = TupleSchema.builder().addField("a", Void.TYPE).directMemory();
 
-        final IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, builder::build, "Should throw with unsupported type");
+        final IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, builder::build,
+                "Should throw with unsupported type");
         assertEquals("Unsupported type: void", ex.getLocalizedMessage(), "Should have correct message");
     }
 
     @Test
     public void testInterfaceIsImplemented() throws Exception {
-        TupleSchema schema = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                implementInterface(StaticBinding.class).
-                directMemory().
-                build();
+        TupleSchema schema = TupleSchema.builder().addField("a", Long.TYPE).implementInterface(StaticBinding.class)
+                .directMemory().build();
         FastTuple tuple = schema.createTuple();
         assertTrue(tuple instanceof StaticBinding);
     }
@@ -128,7 +98,8 @@ public class DirectTupleCodeGeneratorTest {
         assertNotNull(clazz.getDeclaredMethod(name, type));
     }
 
-    public void assertGetterAndSetterRoundTrip(Object tuple, Class<?> clazz, String name, Class<?> type, Object value) throws Exception {
+    public void assertGetterAndSetterRoundTrip(Object tuple, Class<?> clazz, String name, Class<?> type, Object value)
+            throws Exception {
         clazz.getDeclaredMethod(name, type).invoke(tuple, value);
         assertEquals(value, clazz.getDeclaredMethod(name).invoke(tuple));
     }
@@ -165,8 +136,7 @@ public class DirectTupleCodeGeneratorTest {
 
     public interface StaticBinding {
         void a(long a);
+
         long a();
     }
 }
-
-

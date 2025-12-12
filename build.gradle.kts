@@ -4,21 +4,24 @@ plugins {
     java
     jacoco
     id("org.sonarqube") version "7.2.1.6560"
-    id("info.solidsoft.pitest") version "1.15.0" apply(false)
-    id("org.jreleaser") version "1.15.0" apply(false)
-    id("net.ltgt.errorprone") version "4.1.0"
-    id("com.gradleup.shadow") version "8.3.6" apply(false)
+    id("info.solidsoft.pitest") version "1.15.0" apply (false)
+    id("org.jreleaser") version "1.15.0" apply (false)
+    id("com.diffplug.spotless") version "8.1.0"
+    id("net.ltgt.errorprone") version "4.3.0"
+    id("com.gradleup.shadow") version "8.3.6" apply (false)
 }
 
 val janinoVersion by extra("3.1.12")
-val errorProneVersion by extra("2.31.0")
+val errorProneVersion by extra("2.45.0")
 
 allprojects {
-    description = "FastTuple is a library for generating heterogeneous tuples of primitive types from a runtime defined schema without boxing."
+    description =
+        "FastTuple is a library for generating heterogeneous tuples of primitive types from a runtime defined schema without boxing."
 
     apply(plugin = "org.sonarqube")
     apply(plugin = "java-library")
     apply(plugin = "jacoco")
+    apply(plugin = "com.diffplug.spotless")
     apply(plugin = "net.ltgt.errorprone")
 
     repositories {
@@ -26,8 +29,7 @@ allprojects {
     }
 
     dependencies {
-        errorprone("com.google.errorprone:error_prone_core:${errorProneVersion}")
-
+        errorprone("com.google.errorprone:error_prone_core:$errorProneVersion")
     }
 
     java {
@@ -38,8 +40,52 @@ allprojects {
     }
 
     tasks.withType<JavaCompile>().configureEach {
-        options.errorprone.disableWarningsInGeneratedCode = true
+        options.encoding = "UTF-8"
+        options.compilerArgs.add("-parameters")
+        options.compilerArgs.add("-Werror") // Treat warnings as errors
+        options.errorprone {
+            disableWarningsInGeneratedCode = true
+            // Exclude JMH generated code from ErrorProne checks
+            excludedPaths = ".*/build/generated/sources/annotationProcessor/.*"
+        }
+    }
 
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        java {
+            target("src/**/*.java")
+
+            // Use Eclipse formatter with IntelliJ-like configuration
+            // This provides the closest match to IntelliJ IDEA defaults
+            eclipse().configFile(rootProject.file("spotless.xml"))
+
+            // Import order matching IntelliJ defaults
+            importOrder(
+                "java",
+                "javax",
+                "jakarta",
+                "",
+                "com",
+                "org",
+                "\\#",
+            )
+
+            // Remove unused imports
+            removeUnusedImports()
+
+            // Trim trailing whitespace
+            trimTrailingWhitespace()
+
+            // End files with newline
+            endWithNewline()
+
+            // Format Javadoc comments
+            formatAnnotations()
+        }
+
+        kotlinGradle {
+            target("*.gradle.kts")
+            ktlint()
+        }
     }
 
     tasks.jacocoTestReport {

@@ -1,13 +1,14 @@
 package com.nickrobison.tuple.codegen;
 
+import java.util.Collections;
+import java.util.Objects;
+
 import com.nickrobison.tuple.FastTuple;
+
 import org.codehaus.commons.compiler.InternalCompilerException;
 import org.codehaus.commons.compiler.Location;
 import org.codehaus.janino.Java;
 import org.codehaus.janino.SimpleCompiler;
-
-import java.util.Collections;
-import java.util.Objects;
 
 import static com.nickrobison.tuple.codegen.CodegenUtil.emptyParams;
 
@@ -36,8 +37,7 @@ public class TupleAllocatorGenerator extends SimpleCompiler {
         } catch (ClassNotFoundException ex) {
             throw new InternalCompilerException(
                     "SNO: Generated compilation unit does not declare class '" + packageName + "." + className + "'",
-                    ex
-            );
+                    ex);
         }
     }
 
@@ -45,45 +45,30 @@ public class TupleAllocatorGenerator extends SimpleCompiler {
         return (TupleAllocator) allocatorClass.getConstructor().newInstance();
     }
 
-    private Java.PackageMemberClassDeclaration makeClassDefinition(Location loc, Class<?> tupleClass, String className) {
-        Java.PackageMemberClassDeclaration cd = new Java.PackageMemberClassDeclaration(
-                loc,
-                null,
-                new Java.AccessModifier[]{new Java.AccessModifier("public", loc)},
-                className,
-                null,
-                null,
-                new Java.Type[]{
-                        classToType(loc, TupleAllocator.class)
-                });
+    private Java.PackageMemberClassDeclaration makeClassDefinition(Location loc, Class<?> tupleClass,
+            String className) {
+        Java.PackageMemberClassDeclaration cd = new Java.PackageMemberClassDeclaration(loc, null,
+                new Java.AccessModifier[] { new Java.AccessModifier("public", loc) }, className, null, null,
+                new Java.Type[] { classToType(loc, TupleAllocator.class) });
 
-        cd.addDeclaredMethod(new Java.MethodDeclarator(
-                loc,
-                null,
-                new Java.AccessModifier[]{new Java.AccessModifier("public", loc)},
-                null,
-                classToType(loc, FastTuple.class),
-                "allocate",
-                emptyParams(loc),
-                new Java.Type[0],
-                null,
-                Collections.singletonList(
-                        new Java.ReturnStatement(loc,
-                                new Java.NewClassInstance(
-                                        loc,
-                                        null,
-                                        new Java.ReferenceType(loc, new Java.NormalAnnotation[]{}, tupleClass.getCanonicalName().split("\\."), new Java.TypeArgument[0]),
-                                        new Java.Rvalue[0]))
-                )
-        ));
+        cd.addDeclaredMethod(new Java.MethodDeclarator(loc, null,
+                new Java.AccessModifier[] { new Java.AccessModifier("public", loc) }, null,
+                classToType(loc, FastTuple.class), "allocate", emptyParams(loc), new Java.Type[0], null,
+                Collections.singletonList(new Java.ReturnStatement(loc,
+                        new Java.NewClassInstance(loc, null,
+                                new Java.ReferenceType(loc, new Java.NormalAnnotation[] {},
+                                        tupleClass.getCanonicalName().split("\\."), new Java.TypeArgument[0]),
+                                new Java.Rvalue[0])))));
 
         return cd;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TupleAllocatorGenerator)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof TupleAllocatorGenerator))
+            return false;
         TupleAllocatorGenerator that = (TupleAllocatorGenerator) o;
         return Objects.equals(allocatorClass, that.allocatorClass);
     }

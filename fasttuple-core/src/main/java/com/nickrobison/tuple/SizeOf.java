@@ -5,7 +5,8 @@ package com.nickrobison.tuple;
  */
 public final class SizeOf {
 
-    private SizeOf() {}
+    private SizeOf() {
+    }
 
     public static int sizeOf(Class<?> c) {
         if (c.equals(Byte.TYPE)) {

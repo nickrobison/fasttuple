@@ -1,11 +1,12 @@
 package com.nickrobison.tuple.codegen;
 
+import java.lang.reflect.Constructor;
+
 import com.nickrobison.tuple.FastTuple;
 import com.nickrobison.tuple.HeapTupleSchema;
 import com.nickrobison.tuple.TupleSchema;
-import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Constructor;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,18 +16,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HeapTupleCodeGeneratorTest {
     @Test
     public void testAccessorsGetGenerated() throws Exception {
-        HeapTupleSchema schema = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                addField("b", Integer.TYPE).
-                addField("c", Short.TYPE).
-                addField("d", Character.TYPE).
-                addField("e", Byte.TYPE).
-                addField("f", Float.TYPE).
-                addField("g", Double.TYPE).
-                heapMemory().
-                build();
+        HeapTupleSchema schema = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Integer.TYPE)
+                .addField("c", Short.TYPE).addField("d", Character.TYPE).addField("e", Byte.TYPE)
+                .addField("f", Float.TYPE).addField("g", Double.TYPE).heapMemory().build();
 
-        HeapTupleCodeGenerator codegen = new HeapTupleCodeGenerator(null, schema.getFieldNames(), schema.getFieldTypes());
+        HeapTupleCodeGenerator codegen = new HeapTupleCodeGenerator(null, schema.getFieldNames(),
+                schema.getFieldTypes());
         Class<?> clazz = codegen.cookToClass();
         assertNullConstructorGenerated(clazz);
         assertGetterAndSetterGenerated(clazz, "a", long.class);
@@ -40,77 +35,53 @@ public class HeapTupleCodeGeneratorTest {
 
     @Test
     public void testAccessorsWork() throws Exception {
-        TupleSchema schema = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                addField("b", Integer.TYPE).
-                addField("c", Short.TYPE).
-                addField("d", Character.TYPE).
-                addField("e", Byte.TYPE).
-                addField("f", Float.TYPE).
-                addField("g", Double.TYPE).
-                heapMemory().
-                build();
+        TupleSchema schema = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Integer.TYPE)
+                .addField("c", Short.TYPE).addField("d", Character.TYPE).addField("e", Byte.TYPE)
+                .addField("f", Float.TYPE).addField("g", Double.TYPE).heapMemory().build();
         FastTuple tuple = schema.createTuple();
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "a", Long.TYPE, 100L);
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "b", Integer.TYPE, 40);
-        assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "c", Short.TYPE, (short)10);
+        assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "c", Short.TYPE, (short) 10);
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "d", Character.TYPE, 'j');
-        assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "e", Byte.TYPE, (byte)255);
+        assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "e", Byte.TYPE, (byte) 255);
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "f", Float.TYPE, 0.125f);
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "g", Double.TYPE, 0.125);
     }
 
     @Test
     public void testIndexedSetAndGet() throws Exception {
-        TupleSchema schema = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                addField("b", Integer.TYPE).
-                addField("c", Short.TYPE).
-                addField("d", Character.TYPE).
-                addField("e", Byte.TYPE).
-                addField("f", Float.TYPE).
-                addField("g", Double.TYPE).
-                heapMemory().
-                build();
+        TupleSchema schema = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Integer.TYPE)
+                .addField("c", Short.TYPE).addField("d", Character.TYPE).addField("e", Byte.TYPE)
+                .addField("f", Float.TYPE).addField("g", Double.TYPE).heapMemory().build();
         FastTuple tuple = schema.createTuple();
         assertIndexedGetterAndSetterRoundTrip(tuple, 1, 100L);
         assertIndexedGetterAndSetterRoundTrip(tuple, 2, 40);
-        assertIndexedGetterAndSetterRoundTrip(tuple, 3, (short)10);
+        assertIndexedGetterAndSetterRoundTrip(tuple, 3, (short) 10);
         assertIndexedGetterAndSetterRoundTrip(tuple, 4, 'j');
-        assertIndexedGetterAndSetterRoundTrip(tuple, 5, (byte)255);
+        assertIndexedGetterAndSetterRoundTrip(tuple, 5, (byte) 255);
         assertIndexedGetterAndSetterRoundTrip(tuple, 6, 0.125f);
         assertIndexedGetterAndSetterRoundTrip(tuple, 7, 0.125);
     }
 
     @Test
     public void testIndexedTypedSetAndGet() throws Exception {
-        TupleSchema schema = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                addField("b", Integer.TYPE).
-                addField("c", Short.TYPE).
-                addField("d", Character.TYPE).
-                addField("e", Byte.TYPE).
-                addField("f", Float.TYPE).
-                addField("g", Double.TYPE).
-                heapMemory().
-                build();
+        TupleSchema schema = TupleSchema.builder().addField("a", Long.TYPE).addField("b", Integer.TYPE)
+                .addField("c", Short.TYPE).addField("d", Character.TYPE).addField("e", Byte.TYPE)
+                .addField("f", Float.TYPE).addField("g", Double.TYPE).heapMemory().build();
         FastTuple tuple = schema.createTuple();
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 1, 100L);
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 2, 40);
-        assertIndexedTypedGetterAndSetterRoundTrip(tuple, 3, (short)10);
+        assertIndexedTypedGetterAndSetterRoundTrip(tuple, 3, (short) 10);
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 4, 'j');
-        assertIndexedTypedGetterAndSetterRoundTrip(tuple, 5, (byte)255);
+        assertIndexedTypedGetterAndSetterRoundTrip(tuple, 5, (byte) 255);
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 6, 0.125f);
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 7, 0.125);
     }
 
     @Test
     public void testInterfaceIsImplemented() throws Exception {
-        TupleSchema schema = TupleSchema.builder().
-                addField("a", Long.TYPE).
-                implementInterface(StaticBinding.class).
-                heapMemory().
-                build();
+        TupleSchema schema = TupleSchema.builder().addField("a", Long.TYPE).implementInterface(StaticBinding.class)
+                .heapMemory().build();
         FastTuple tuple = schema.createTuple();
         assertInstanceOf(StaticBinding.class, tuple);
     }
@@ -120,7 +91,8 @@ public class HeapTupleCodeGeneratorTest {
         assertNotNull(clazz.getDeclaredMethod(name, type));
     }
 
-    public void assertGetterAndSetterRoundTrip(Object tuple, Class<?> clazz, String name, Class<?> type, Object value) throws Exception {
+    public void assertGetterAndSetterRoundTrip(Object tuple, Class<?> clazz, String name, Class<?> type, Object value)
+            throws Exception {
         clazz.getDeclaredMethod(name, type).invoke(tuple, value);
         assertEquals(value, clazz.getDeclaredMethod(name).invoke(tuple));
     }
@@ -168,6 +140,7 @@ public class HeapTupleCodeGeneratorTest {
     @SuppressWarnings("unused")
     public interface StaticBinding {
         void a(long a);
+
         long a();
     }
 }
