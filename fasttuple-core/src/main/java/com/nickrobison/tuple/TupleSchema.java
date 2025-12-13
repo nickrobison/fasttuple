@@ -27,7 +27,7 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
             throw new IllegalArgumentException("fieldNames and fieldTypes must have equal length");
         }
         for (int i = 0; i < fieldNames.length; i++) {
-            if (!fieldTypes[i].isPrimitive() && !fieldTypes[i].equals(Boolean.TYPE)) {
+            if (!fieldTypes[i].isPrimitive() && !fieldTypes[i].equals(Boolean.TYPE) && !fieldTypes[i].equals(String.class)) {
                 throw new IllegalArgumentException("Invalid field type combination");
             }
         }

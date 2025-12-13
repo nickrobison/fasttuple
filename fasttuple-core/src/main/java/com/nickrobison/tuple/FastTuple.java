@@ -76,6 +76,8 @@ public abstract class FastTuple {
      */
     public abstract double getDouble(int i);
 
+    public abstract String getString(int i);
+
     /**
      * Does an unboxed set on a tuple field.
      *
@@ -138,6 +140,8 @@ public abstract class FastTuple {
      * @throws java.lang.IllegalArgumentException if the specified field is not a double.
      */
     public abstract void setDouble(int i, double value);
+
+    public abstract void setString(int i, String value);
 
     /**
      * Does a boxed set on a tuple field.

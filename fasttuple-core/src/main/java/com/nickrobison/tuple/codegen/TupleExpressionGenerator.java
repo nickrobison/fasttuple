@@ -59,6 +59,10 @@ public class TupleExpressionGenerator extends SimpleCompiler {
         boolean evaluate(FastTuple tuple);
     }
 
+    public interface StringTupleExpression {
+        String evaluate(FastTuple tuple);
+    }
+
     private static final String packageName = "com.nickrobison.tuple";
     private static final AtomicLong counter = new AtomicLong(0);
     private final String expression;
@@ -127,6 +131,10 @@ public class TupleExpressionGenerator extends SimpleCompiler {
 
         public BooleanTupleExpression returnBoolean() throws Exception {
             return (BooleanTupleExpression) new TupleExpressionGenerator(schema, expression, BooleanTupleExpression.class, Boolean.TYPE).evaluator();
+        }
+
+        public StringTupleExpression returnString() throws Exception {
+            return (StringTupleExpression) new TupleExpressionGenerator(schema, expression, StringTupleExpression.class, String.class).evaluator();
         }
 
     }

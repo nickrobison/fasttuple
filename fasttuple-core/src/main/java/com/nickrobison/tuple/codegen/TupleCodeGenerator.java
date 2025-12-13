@@ -8,11 +8,7 @@ import org.codehaus.janino.Java;
 import org.codehaus.janino.Java.AbstractCompilationUnit.SingleTypeImportDeclaration;
 import org.codehaus.janino.SimpleCompiler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.nickrobison.tuple.codegen.CodegenUtil.nullConstructor;
@@ -32,7 +28,8 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
             Character.TYPE,
             Byte.TYPE,
             Float.TYPE,
-            Double.TYPE
+            Double.TYPE,
+            String.class
     };
     protected final Class<?> iface;
     protected final String[] fieldNames;
@@ -58,14 +55,18 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
             return getClassLoader().loadClass("com.nickrobison.tuple." + className);
         } catch (ClassNotFoundException ex) {
             throw new InternalCompilerException(
-                "SNO: Generated compilation unit does not declare class 'com.nickrobison.tuple." + className + "'",
-                ex
+                    "SNO: Generated compilation unit does not declare class 'com.nickrobison.tuple." + className + "'",
+                    ex
             );
         }
     }
 
     protected Java.CompilationUnit makeCompilationUnit() throws CompileException {
-        Java.CompilationUnit cu = new Java.CompilationUnit(null, new SingleTypeImportDeclaration[]{new SingleTypeImportDeclaration(loc, "com.nickrobison.tuple.unsafe.Coterie".split("\\."))});
+        final Java.AbstractCompilationUnit.ImportDeclaration[] imports = {
+                new SingleTypeImportDeclaration(loc, "com.nickrobison.tuple.unsafe.Coterie".split("\\.")),
+                new Java.AbstractCompilationUnit.StaticImportOnDemandDeclaration(loc, "com.nickrobison.tuple.unsafe.Coterie".split("\\."))
+        };
+        Java.CompilationUnit cu = new Java.CompilationUnit(null, imports);
         Location cuLoc = new Location("", ((short) 0), ((short) 0));
         cu.setPackageDeclaration(new Java.PackageDeclaration(cuLoc, "com.nickrobison.tuple"));
         Class<?>[] ifaces;
@@ -130,13 +131,13 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
     protected List<Java.MethodDeclarator> generateIndexedTypedGetters() {
         List<Java.MethodDeclarator> methods = new ArrayList<>();
         for (Class<?> type : types) {
-            methods.add(new Java.MethodDeclarator(
+            final Java.MethodDeclarator method = new Java.MethodDeclarator(
                     loc,
                     null,
                     new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)},
                     null,
-                    new Java.PrimitiveType(loc, primIndex(type)),
-                    "get" + capitalize(type.getName()),
+                    classToType(loc, type),
+                    "get" + capitalize(type.getSimpleName()),
                     new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{
                             new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, new Java.PrimitiveType(loc, Java.Primitive.INT), INDEX)}, false),
                     new Java.Type[]{},
@@ -144,7 +145,8 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
                     Collections.singletonList(
                             new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[]{INDEX}), generateIndexedGetterImpl(type))
                     )
-            ));
+            );
+            methods.add(method);
         }
         return methods;
     }
@@ -152,23 +154,24 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
     protected List<Java.MethodDeclarator> generateIndexedTypedSetters() throws CompileException {
         List<Java.MethodDeclarator> methods = new ArrayList<>();
         for (Class<?> type : types) {
-            methods.add(new Java.MethodDeclarator(
+            final Java.MethodDeclarator method = new Java.MethodDeclarator(
                     loc,
                     null,
                     new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)},
                     null,
                     new Java.PrimitiveType(loc, Java.Primitive.VOID),
-                    "set" + capitalize(type.getName()),
+                    "set" + capitalize(type.getSimpleName()),
                     new Java.FunctionDeclarator.FormalParameters(loc, new Java.FunctionDeclarator.FormalParameter[]{
                             new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, new Java.PrimitiveType(loc, Java.Primitive.INT), INDEX),
-                            new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, new Java.PrimitiveType(loc, primIndex(type)), VALUE)
+                            new Java.FunctionDeclarator.FormalParameter(loc, new Java.AccessModifier[]{new Java.AccessModifier(CodegenUtil.PUBLIC, loc)}, classToType(loc, type), VALUE)
                     }, false),
                     new Java.Type[]{},
                     null,
                     Collections.singletonList(
                             new Java.SwitchStatement(loc, new Java.AmbiguousName(loc, new String[]{INDEX}), generateIndexedSetterImpl(VALUE, type))
                     )
-            ));
+            );
+            methods.add(method);
         }
         return methods;
     }
@@ -242,18 +245,6 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
 
     protected String capitalize(String st) {
         return toUpperCase(st.charAt(0)) + st.substring(1);
-    }
-
-
-    protected Java.Primitive primIndex(Class<?> type) {
-        if (type.equals(Long.TYPE)) return Java.Primitive.LONG;
-        if (type.equals(Integer.TYPE)) return Java.Primitive.INT;
-        if (type.equals(Short.TYPE)) return Java.Primitive.SHORT;
-        if (type.equals(Character.TYPE)) return Java.Primitive.CHAR;
-        if (type.equals(Byte.TYPE)) return Java.Primitive.BYTE;
-        if (type.equals(Float.TYPE)) return Java.Primitive.FLOAT;
-        if (type.equals(Double.TYPE)) return Java.Primitive.DOUBLE;
-        return Java.Primitive.VOID;
     }
 
     protected String primToBox(Class<?> type) {
