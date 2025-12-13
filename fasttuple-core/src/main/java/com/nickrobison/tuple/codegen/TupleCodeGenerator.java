@@ -62,7 +62,11 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
     }
 
     protected Java.CompilationUnit makeCompilationUnit() throws CompileException {
-        Java.CompilationUnit cu = new Java.CompilationUnit(null, new SingleTypeImportDeclaration[]{new SingleTypeImportDeclaration(loc, "com.nickrobison.tuple.unsafe.Coterie".split("\\."))});
+        final Java.AbstractCompilationUnit.ImportDeclaration[] imports = {
+                new SingleTypeImportDeclaration(loc, "com.nickrobison.tuple.unsafe.Coterie".split("\\.")),
+                new Java.AbstractCompilationUnit.StaticImportOnDemandDeclaration(loc, "com.nickrobison.tuple.unsafe.Coterie".split("\\."))
+        };
+        Java.CompilationUnit cu = new Java.CompilationUnit(null, imports);
         Location cuLoc = new Location("", ((short) 0), ((short) 0));
         cu.setPackageDeclaration(new Java.PackageDeclaration(cuLoc, "com.nickrobison.tuple"));
         Class<?>[] ifaces;

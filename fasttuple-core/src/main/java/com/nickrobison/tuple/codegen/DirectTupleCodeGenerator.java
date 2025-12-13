@@ -165,6 +165,8 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
             return "Double";
         } else if (type.equals(Long.TYPE)) {
             return "Long";
+        } else if (type.equals(String.class)) {
+            return "String";
         }
         throw new IllegalArgumentException(String.format("Unsupported type: %s", type.getSimpleName()));
     }

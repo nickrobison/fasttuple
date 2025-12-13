@@ -10,7 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class DirectTupleSchemaTest {
 
-    public DirectTupleSchemaTest() {}
+    public DirectTupleSchemaTest() {
+    }
 
     @Test
     public void layoutTest() throws Exception {
@@ -22,22 +23,24 @@ public class DirectTupleSchemaTest {
                 addField("aFloat", Float.TYPE).
                 addField("aLong", Long.TYPE).
                 addField("aDouble", Double.TYPE).
+                addField("aString", String.class).
                 directMemory().
                 build();
 
-        //layout should be aLong, aDouble, aInt, aFloat, aChar, aShort, aByte
+        //layout should be aString, aLong, aDouble, aInt, aFloat, aChar, aShort, aByte, aString
 
         int[] layout = schema.getLayout();
-        assertEquals(0, layout[5]);
-        assertEquals(8, layout[6]);
-        assertEquals(16, layout[2]);
-        assertEquals(20, layout[4]);
-        assertEquals(24, layout[1]);
-        assertEquals(26, layout[3]);
-        assertEquals(28, layout[0]);
+        assertEquals(0, layout[7]);
+        assertEquals(24, layout[5]);
+        assertEquals(32, layout[6]);
+        assertEquals(40, layout[2]);
+        assertEquals(44, layout[4]);
+        assertEquals(48, layout[1]);
+        assertEquals(50, layout[3]);
+        assertEquals(52, layout[0]);
 
-        //default pad to long word
-        assertEquals(32, schema.getByteSize());
+        // no padding
+        assertEquals(56, schema.getByteSize());
     }
 
     @Test
@@ -50,21 +53,54 @@ public class DirectTupleSchemaTest {
                 addField("aFloat", Float.TYPE).
                 addField("aLong", Long.TYPE).
                 addField("aDouble", Double.TYPE).
+                addField("aString", String.class).
                 directMemory().
                 padToWordSize(64).
                 build();
 
-        //layout should be aLong, aDouble, aInt, aFloat, aChar, aShort, aByte
+        //layout should be aString, aLong, aDouble, aInt, aFloat, aChar, aShort, aByte
         int[] layout = schema.getLayout();
-        assertEquals(0, layout[5]);
-        assertEquals(8, layout[6]);
-        assertEquals(16, layout[2]);
-        assertEquals(20, layout[4]);
-        assertEquals(24, layout[1]);
-        assertEquals(26, layout[3]);
-        assertEquals(28, layout[0]);
+        assertEquals(0, layout[7]);
+        assertEquals(24, layout[5]);
+        assertEquals(32, layout[6]);
+        assertEquals(40, layout[2]);
+        assertEquals(44, layout[4]);
+        assertEquals(48, layout[1]);
+        assertEquals(50, layout[3]);
+        assertEquals(52, layout[0]);
         //default pad to long word
         assertEquals(64, schema.getByteSize());
+    }
+
+    @Test
+    public void paddingOverflowTest() throws Exception {
+        DirectTupleSchema schema = TupleSchema.builder().
+                addField("aByte", Byte.TYPE).
+                addField("aChar", Character.TYPE).
+                addField("aInt", Integer.TYPE).
+                addField("aShort", Short.TYPE).
+                addField("aFloat", Float.TYPE).
+                addField("aLong", Long.TYPE).
+                addField("aDouble", Double.TYPE).
+                addField("aString", String.class).
+                addField("aString2", String.class).
+                directMemory().
+                padToWordSize(64).
+                build();
+
+        //layout should be aString, aString, aLong, aDouble, aInt, aFloat, aChar, aShort, aByte
+        int[] layout = schema.getLayout();
+        assertEquals(0, layout[7]);
+        assertEquals(24, layout[8]);
+        assertEquals(48, layout[5]);
+        assertEquals(56, layout[6]);
+        assertEquals(64, layout[2]);
+        assertEquals(68, layout[4]);
+        assertEquals(72, layout[1]);
+        assertEquals(74, layout[3]);
+        assertEquals(76, layout[0]);
+        //default pad to long word
+        assertEquals(128, schema.getByteSize());
     }
 
     @Test
@@ -81,12 +117,12 @@ public class DirectTupleSchemaTest {
                 build();
 
         long record = schema.createRecord();
-        schema.setByte(record,   0, (byte)6);
-        schema.setChar(record,   1, (char)8);
-        schema.setInt(record,    2, 50010);
-        schema.setShort(record,  3, (short)2500);
-        schema.setFloat(record,  4, 0.1f);
-        schema.setLong(record,   5, 100000L);
+        schema.setByte(record, 0, (byte) 6);
+        schema.setChar(record, 1, (char) 8);
+        schema.setInt(record, 2, 50010);
+        schema.setShort(record, 3, (short) 2500);
+        schema.setFloat(record, 4, 0.1f);
+        schema.setLong(record, 5, 100000L);
         schema.setDouble(record, 6, 0.59403);
 
         assertEquals(6, schema.getByte(record, 0));
@@ -114,7 +150,7 @@ public class DirectTupleSchemaTest {
         FastTuple[] tuples = schema.createTupleArray(10);
         assertEquals(10, tuples.length);
 
-        for (int i=0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             assertNotNull(tuples[i]);
 
             tuples[i].setByte(1, (byte) 1);
@@ -149,10 +185,10 @@ public class DirectTupleSchemaTest {
                 directMemory().
                 build();
 
-        TypedTuple[] tuples = schema.createTypedTupleArray(TypedTuple.class,10);
+        TypedTuple[] tuples = schema.createTypedTupleArray(TypedTuple.class, 10);
         assertEquals(10, tuples.length);
 
-        for (int i=0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             assertNotNull(tuples[i]);
 
             tuples[i].aByte((byte) 1);

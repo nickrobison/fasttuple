@@ -14,6 +14,8 @@ public final class SizeOf {
             return 2;
         } else if (c.equals(Integer.TYPE) || c.equals(Float.TYPE)) {
             return 4;
+        } else if (c.equals(String.class)) {
+            return 24;
         } else {
             return 8;
         }

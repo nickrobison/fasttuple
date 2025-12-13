@@ -22,6 +22,7 @@ public class DirectTupleCodeGeneratorTest {
                 addField("e", Byte.TYPE).
                 addField("f", Float.TYPE).
                 addField("g", Double.TYPE).
+                addField("h", String.class).
                 directMemory().
                 build();
 
@@ -34,6 +35,7 @@ public class DirectTupleCodeGeneratorTest {
         assertGetterAndSetterGenerated(clazz, "e", byte.class);
         assertGetterAndSetterGenerated(clazz, "f", float.class);
         assertGetterAndSetterGenerated(clazz, "g", double.class);
+        assertGetterAndSetterGenerated(clazz, "h", String.class);
     }
 
     @Test
@@ -46,6 +48,7 @@ public class DirectTupleCodeGeneratorTest {
                 addField("e", Byte.TYPE).
                 addField("f", Float.TYPE).
                 addField("g", Double.TYPE).
+                addField("h", String.class).
                 directMemory().
                 build();
         FastTuple tuple = schema.createTuple();
@@ -56,6 +59,7 @@ public class DirectTupleCodeGeneratorTest {
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "e", Byte.TYPE, (byte)255);
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "f", Float.TYPE, 0.125f);
         assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "g", Double.TYPE, 0.125);
+        assertGetterAndSetterRoundTrip(tuple, schema.tupleClass(), "h", String.class, "Hello, world!");
     }
 
     @Test
@@ -68,6 +72,7 @@ public class DirectTupleCodeGeneratorTest {
                 addField("e", Byte.TYPE).
                 addField("f", Float.TYPE).
                 addField("g", Double.TYPE).
+                addField("h", String.class).
                 directMemory().
                 build();
         FastTuple tuple = schema.createTuple();
@@ -78,6 +83,7 @@ public class DirectTupleCodeGeneratorTest {
         assertIndexedGetterAndSetterRoundTrip(tuple, 5, (byte)255);
         assertIndexedGetterAndSetterRoundTrip(tuple, 6, 0.125f);
         assertIndexedGetterAndSetterRoundTrip(tuple, 7, 0.125);
+        assertIndexedGetterAndSetterRoundTrip(tuple, 8, "Hello, 你好世界1");
     }
 
     @Test
@@ -90,6 +96,7 @@ public class DirectTupleCodeGeneratorTest {
                 addField("e", Byte.TYPE).
                 addField("f", Float.TYPE).
                 addField("g", Double.TYPE).
+                addField("h", String.class).
                 directMemory().
                 build();
         FastTuple tuple = schema.createTuple();
@@ -100,6 +107,7 @@ public class DirectTupleCodeGeneratorTest {
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 5, (byte) 255);
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 6, 0.125f);
         assertIndexedTypedGetterAndSetterRoundTrip(tuple, 7, 0.125);
+        assertIndexedGetterAndSetterRoundTrip(tuple, 8, "hello, world!");
     }
 
     @Test
@@ -120,7 +128,18 @@ public class DirectTupleCodeGeneratorTest {
                 directMemory().
                 build();
         FastTuple tuple = schema.createTuple();
-        assertTrue(tuple instanceof StaticBinding);
+        assertInstanceOf(StaticBinding.class, tuple);
+    }
+
+    @Test
+    public void testStringInterfaceIsImplemented() throws Exception {
+        TupleSchema schema = TupleSchema.builder().
+                addField("a", String.class).
+                implementInterface(StringBinding.class).
+                directMemory().
+                build();
+        FastTuple tuple = schema.createTuple();
+        assertInstanceOf(StringBinding.class, tuple);
     }
 
     public void assertGetterAndSetterGenerated(Class<?> clazz, String name, Class<?> type) throws Exception {
@@ -163,9 +182,16 @@ public class DirectTupleCodeGeneratorTest {
         }
     }
 
+    @SuppressWarnings("unused")
     public interface StaticBinding {
         void a(long a);
         long a();
+    }
+
+    @SuppressWarnings("unused")
+    public interface StringBinding {
+        void a(String a);
+        String a();
     }
 }
 

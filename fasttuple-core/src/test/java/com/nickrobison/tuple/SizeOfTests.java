@@ -14,5 +14,6 @@ public class SizeOfTests {
     @Test
     void testSizeOf() {
         assertEquals(1, SizeOf.sizeOf(Byte.TYPE));
+        assertEquals(24, SizeOf.sizeOf(String.class));
     }
 }
