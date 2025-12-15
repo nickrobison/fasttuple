@@ -27,7 +27,7 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
             throw new IllegalArgumentException("fieldNames and fieldTypes must have equal length");
         }
         for (int i = 0; i < fieldNames.length; i++) {
-            if (!fieldTypes[i].isPrimitive() && !fieldTypes[i].equals(Boolean.TYPE)) {
+            if (!fieldTypes[i].isPrimitive()) {
                 throw new IllegalArgumentException("Invalid field type combination");
             }
         }
@@ -211,9 +211,8 @@ public abstract class TupleSchema implements Loader<FastTuple>, Destroyer<FastTu
      * @throws IllegalArgumentException if the field name is not found in the schema
      */
     public int getFieldIndex(String name) {
-        final String[] cloned = fieldNames.clone();
-        for (int i = 0; i < cloned.length; i++) {
-            if (cloned[i].equals(name)) {
+        for (int i = 0; i < fieldNames.length; i++) {
+            if (fieldNames[i].equals(name)) {
                 return i + 1;
             }
         }

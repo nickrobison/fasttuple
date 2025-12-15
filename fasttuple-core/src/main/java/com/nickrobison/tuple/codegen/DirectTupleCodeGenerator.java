@@ -151,21 +151,6 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
     }
 
     protected String accessorForType(Class<?> type) {
-        if (type.equals(Byte.TYPE)) {
-            return "Byte";
-        } else if (type.equals(Character.TYPE)) {
-            return "Char";
-        } else if (type.equals(Short.TYPE)) {
-            return "Short";
-        } else if (type.equals(Integer.TYPE)) {
-            return "Int";
-        } else if (type.equals(Float.TYPE)) {
-            return "Float";
-        } else if (type.equals(Double.TYPE)) {
-            return "Double";
-        } else if (type.equals(Long.TYPE)) {
-            return "Long";
-        }
-        throw new IllegalArgumentException(String.format("Unsupported type: %s", type.getSimpleName()));
+        return TypeMapping.toAccessorName(type);
     }
 }

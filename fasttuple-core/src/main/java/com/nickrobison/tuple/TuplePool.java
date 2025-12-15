@@ -86,7 +86,9 @@ public class TuplePool<T> {
             for (T tuple : tuples) {
                 deque.push(tuple);
             }
-            assert !references.isEmpty();
+            if (references.isEmpty()) {
+                throw new IllegalStateException("References list should not be empty after reload");
+            }
         } catch (Exception ex) {
             throw new IllegalStateException("Unable to reload Tuple pool");
         }
@@ -99,7 +101,9 @@ public class TuplePool<T> {
         }
         references.clear();
         pool.remove();
-        assert references.isEmpty();
+        if (!references.isEmpty()) {
+            throw new IllegalStateException("References list should be empty after clear");
+        }
     }
 
 

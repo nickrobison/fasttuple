@@ -246,25 +246,11 @@ public abstract class TupleCodeGenerator extends SimpleCompiler {
 
 
     protected Java.Primitive primIndex(Class<?> type) {
-        if (type.equals(Long.TYPE)) return Java.Primitive.LONG;
-        if (type.equals(Integer.TYPE)) return Java.Primitive.INT;
-        if (type.equals(Short.TYPE)) return Java.Primitive.SHORT;
-        if (type.equals(Character.TYPE)) return Java.Primitive.CHAR;
-        if (type.equals(Byte.TYPE)) return Java.Primitive.BYTE;
-        if (type.equals(Float.TYPE)) return Java.Primitive.FLOAT;
-        if (type.equals(Double.TYPE)) return Java.Primitive.DOUBLE;
-        return Java.Primitive.VOID;
+        return TypeMapping.toPrimitive(type);
     }
 
     protected String primToBox(Class<?> type) {
-        if (type.equals(Long.TYPE)) return "Long";
-        if (type.equals(Integer.TYPE)) return "Integer";
-        if (type.equals(Short.TYPE)) return "Short";
-        if (type.equals(Character.TYPE)) return "Character";
-        if (type.equals(Byte.TYPE)) return "Byte";
-        if (type.equals(Float.TYPE)) return "Float";
-        if (type.equals(Double.TYPE)) return "Double";
-        throw new IllegalArgumentException(String.format("Unsupported type: %s", type.getSimpleName()));
+        return TypeMapping.toBoxedName(type);
     }
 
     protected Java.SwitchStatement.SwitchBlockStatementGroup generateDefaultCase() {
