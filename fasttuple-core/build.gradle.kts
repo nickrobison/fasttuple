@@ -5,7 +5,7 @@ plugins {
     id("org.jreleaser")
 }
 
-val junitVersion = "5.12.1"
+val junitVersion = "6.0.1"
 
 dependencies {
     api("org.codehaus.janino:janino:${rootProject.ext.get("janinoVersion")}")
