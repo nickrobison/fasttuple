@@ -49,6 +49,9 @@ allprojects {
         javaLauncher.set(javaToolchains.launcherFor {
             languageVersion.set(testJavaVersion.map { JavaLanguageVersion.of(it) })
         })
+        doFirst {
+            logger.lifecycle("Running tests in '${path}' with JDK: ${javaLauncher.get().executablePath}")
+        }
     }
 
     tasks.jacocoTestReport {
