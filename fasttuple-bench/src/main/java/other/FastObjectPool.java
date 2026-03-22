@@ -1,10 +1,7 @@
 package other;
 
-import sun.misc.Unsafe;
+import com.nickrobison.tuple.unsafe.Coterie;
 
-import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedExceptionAction;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -44,8 +41,8 @@ public class FastObjectPool<T> {
         }
         mask = size-1;
         releasePointer = size;
-        BASE = THE_UNSAFE.arrayBaseOffset(Holder[].class);
-        INDEXSCALE = THE_UNSAFE.arrayIndexScale(Holder[].class);
+        BASE = Coterie.arrayBaseOffset(Holder[].class);
+        INDEXSCALE = Coterie.arrayIndexScale(Holder[].class);
         ASHIFT = 31L - Integer.numberOfLeadingZeros((int) INDEXSCALE);
     }
 
@@ -66,8 +63,8 @@ public class FastObjectPool<T> {
         {
             int index = localTakePointer & mask;
             Holder<T> holder = objects[index];
-            //if(holder!=null && THE_UNSAFE.compareAndSwapObject(objects, (index*INDEXSCALE)+BASE, holder, null))
-            if(holder!=null && THE_UNSAFE.compareAndSwapObject(objects, (index<<ASHIFT)+BASE, holder, null))
+            //if(holder!=null && Coterie.compareAndSwapObject(objects, (index*INDEXSCALE)+BASE, holder, null))
+            if(holder!=null && Coterie.compareAndSwapObject(objects, (index<<ASHIFT)+BASE, holder, null))
             {
                 takePointer = localTakePointer+1;
                 if(holder.state.compareAndSet(Holder.FREE, Holder.USED))
@@ -89,7 +86,7 @@ public class FastObjectPool<T> {
             long index = ((localValue & mask)<<ASHIFT ) + BASE;
             if(object.state.compareAndSet(Holder.USED, Holder.FREE))
             {
-                THE_UNSAFE.putOrderedObject(objects, index, object);
+                Coterie.putOrderedObject(objects, index, object);
                 releasePointer = localValue+1;
             }
             else
@@ -121,21 +118,5 @@ public class FastObjectPool<T> {
 
     public interface PoolFactory<T> {
         T create();
-    }
-
-    public static final Unsafe THE_UNSAFE;
-
-    static {
-        try {
-            final PrivilegedExceptionAction<Unsafe> action = () -> {
-                Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
-                theUnsafe.setAccessible(true);
-                return (Unsafe) theUnsafe.get(null);
-            };
-
-            THE_UNSAFE = AccessController.doPrivileged(action);
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to load unsafe", e);
-        }
     }
 }
