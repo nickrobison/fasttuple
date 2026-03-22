@@ -27,12 +27,6 @@ tasks.test {
     useJUnitPlatform()
 }
 
-tasks.jar {
-    manifest {
-        attributes("Automatic-Module-Name" to "com.nickrobison.fasttuple")
-    }
-}
-
 val isRelease = !version.toString().endsWith("SNAPSHOT")
 
 publishing {
