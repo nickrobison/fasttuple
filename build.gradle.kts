@@ -3,11 +3,11 @@ import net.ltgt.gradle.errorprone.errorprone
 plugins {
     java
     jacoco
-    id("org.sonarqube") version "7.2.2.6593"
-    id("info.solidsoft.pitest") version "1.15.0" apply(false)
-    id("org.jreleaser") version "1.21.0" apply(false)
+    id("org.sonarqube") version "7.2.3.7755"
+    id("info.solidsoft.pitest") version "1.19.0-rc.3" apply(false)
+    id("org.jreleaser") version "1.23.0" apply(false)
     id("net.ltgt.errorprone") version "5.1.0"
-    id("com.gradleup.shadow") version "8.3.6" apply(false)
+    id("com.gradleup.shadow") version "9.4.0" apply(false)
 }
 
 val janinoVersion by extra("3.1.12")
@@ -31,15 +31,27 @@ allprojects {
     }
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(11))
+        }
         withJavadocJar()
         withSourcesJar()
     }
 
     tasks.withType<JavaCompile>().configureEach {
         options.errorprone.disableWarningsInGeneratedCode = true
+    }
 
+    val testJavaVersion = providers.gradleProperty("testJavaVersion").map { v ->
+        v.toIntOrNull() ?: throw GradleException("Property 'testJavaVersion' must be a valid integer, got: '$v'")
+    }.orElse(11)
+    tasks.withType<Test>().configureEach {
+        javaLauncher.set(javaToolchains.launcherFor {
+            languageVersion.set(testJavaVersion.map { JavaLanguageVersion.of(it) })
+        })
+        doFirst {
+            logger.lifecycle("Running tests in '${path}' with JDK: ${javaLauncher.get().executablePath}")
+        }
     }
 
     tasks.jacocoTestReport {
