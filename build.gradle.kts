@@ -40,6 +40,7 @@ allprojects {
 
     tasks.withType<JavaCompile>().configureEach {
         options.errorprone.disableWarningsInGeneratedCode = true
+        options.errorprone.excludedPaths.set(".*/build/generated/.*")
     }
 
     val testJavaVersion = providers.gradleProperty("testJavaVersion").map { v ->
