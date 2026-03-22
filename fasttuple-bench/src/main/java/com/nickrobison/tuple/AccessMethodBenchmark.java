@@ -9,7 +9,6 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import other.FastObjectPool;
-import sun.misc.Unsafe;
 
 import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandles;
@@ -22,7 +21,6 @@ import java.util.concurrent.BlockingQueue;
 @State(Scope.Benchmark)
 public class AccessMethodBenchmark {
     private DirectTupleSchema schema;
-    private static final Unsafe unsafe = Coterie.unsafe();
     private BlockingQueue<Container> containers;
     private PoolSettings<Container> poolSettings = new PoolSettings<>(
             new PoolableObjectBase<Container>() {
@@ -118,21 +116,21 @@ public class AccessMethodBenchmark {
 
     @Benchmark
 public long testOffheapAllocateAndSet() {
-        long record = unsafe.allocateMemory(8 + 4 + 2L);
-    unsafe.putLong(record, 100);
-    unsafe.putInt(record+8, 200);
-    unsafe.putShort(record+12, (short)300);
-    long r = unsafe.getLong(record) + unsafe.getInt(record+8) + unsafe.getShort(record+12);
-    unsafe.freeMemory(record);
+        long record = Coterie.allocateMemory(8 + 4 + 2L);
+    Coterie.putLong(record, 100);
+    Coterie.putInt(record+8, 200);
+    Coterie.putShort(record+12, (short)300);
+    long r = Coterie.getLong(record) + Coterie.getInt(record+8) + Coterie.getShort(record+12);
+    Coterie.freeMemory(record);
     return r;
 }
 
     @Benchmark
     public long testOffheapDirectSet() {
-        unsafe.putLong(record2, 100);
-        unsafe.putInt(record2 + 8L, 200);
-        unsafe.putShort(record2 + 12L, (short)300);
-        return unsafe.getLong(record2) + unsafe.getInt(record2 + 8L) + unsafe.getShort(record2 + 12L);
+        Coterie.putLong(record2, 100);
+        Coterie.putInt(record2 + 8L, 200);
+        Coterie.putShort(record2 + 12L, (short)300);
+        return Coterie.getLong(record2) + Coterie.getInt(record2 + 8L) + Coterie.getShort(record2 + 12L);
     }
 
     @Benchmark

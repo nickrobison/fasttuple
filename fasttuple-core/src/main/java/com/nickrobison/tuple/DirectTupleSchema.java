@@ -3,7 +3,6 @@ package com.nickrobison.tuple;
 import com.nickrobison.tuple.codegen.DirectTupleCodeGenerator;
 import com.nickrobison.tuple.codegen.TupleAllocatorGenerator;
 import com.nickrobison.tuple.unsafe.Coterie;
-import sun.misc.Unsafe;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -22,8 +21,6 @@ public class DirectTupleSchema extends TupleSchema {
     protected long addressOffset;
     protected final int wordSize;
     protected TupleAllocatorGenerator.TupleAllocator allocator;
-
-    private static final Unsafe unsafe = Coterie.unsafe();
 
     public static class Builder extends TupleSchema.Builder {
         protected int wordSize = 8;
@@ -61,59 +58,59 @@ public class DirectTupleSchema extends TupleSchema {
     }
 
     public long getLong(long address, int index) {
-        return unsafe.getLong(address + layout[index]);
+        return Coterie.getLong(address + layout[index]);
     }
 
     public int getInt(long address, int index) {
-        return unsafe.getInt(address + layout[index]);
+        return Coterie.getInt(address + layout[index]);
     }
 
     public short getShort(long address, int index) {
-        return unsafe.getShort(address + layout[index]);
+        return Coterie.getShort(address + layout[index]);
     }
 
     public char getChar(long address, int index) {
-        return unsafe.getChar(address + layout[index]);
+        return Coterie.getChar(address + layout[index]);
     }
 
     public byte getByte(long address, int index) {
-        return unsafe.getByte(address + layout[index]);
+        return Coterie.getByte(address + layout[index]);
     }
 
     public double getDouble(long address, int index) {
-        return unsafe.getDouble(address + layout[index]);
+        return Coterie.getDouble(address + layout[index]);
     }
 
     public float getFloat(long address, int index) {
-        return unsafe.getFloat(address + layout[index]);
+        return Coterie.getFloat(address + layout[index]);
     }
 
     public void setLong(long address, int index, long value) {
-        unsafe.putLong(address + layout[index], value);
+        Coterie.putLong(address + layout[index], value);
     }
 
     public void setInt(long address, int index, int value) {
-        unsafe.putInt(address + layout[index], value);
+        Coterie.putInt(address + layout[index], value);
     }
 
     public void setShort(long address, int index, short value) {
-        unsafe.putShort(address + layout[index], value);
+        Coterie.putShort(address + layout[index], value);
     }
 
     public void setChar(long address, int index, char value) {
-        unsafe.putChar(address + layout[index], value);
+        Coterie.putChar(address + layout[index], value);
     }
 
     public void setByte(long address, int index, byte value) {
-        unsafe.putByte(address + layout[index], value);
+        Coterie.putByte(address + layout[index], value);
     }
 
     public void setFloat(long address, int index, float value) {
-        unsafe.putFloat(address + layout[index], value);
+        Coterie.putFloat(address + layout[index], value);
     }
 
     public void setDouble(long address, int index, double value) {
-        unsafe.putDouble(address + layout[index], value);
+        Coterie.putDouble(address + layout[index], value);
     }
 
     public int[] getLayout() {
@@ -126,16 +123,16 @@ public class DirectTupleSchema extends TupleSchema {
 
     public FastTuple createTuple(long address) {
         FastTuple tuple = allocator.allocate();
-        unsafe.putLong(tuple, addressOffset, address);
+        Coterie.putLong(tuple, addressOffset, address);
         return tuple;
     }
 
     public long createRecord() {
-        return unsafe.allocateMemory(byteSize);
+        return Coterie.allocateMemory(byteSize);
     }
 
     public long createRecordArray(long size) {
-        return unsafe.allocateMemory(size * byteSize);
+        return Coterie.allocateMemory(size * byteSize);
     }
 
     @Override
@@ -172,8 +169,8 @@ public class DirectTupleSchema extends TupleSchema {
 
     @Override
     public void destroyTuple(FastTuple tuple) {
-        long address = unsafe.getLong(tuple, addressOffset);
-        unsafe.freeMemory(address);
+        long address = Coterie.getLong(tuple, addressOffset);
+        Coterie.freeMemory(address);
     }
 
     @Override
@@ -183,32 +180,32 @@ public class DirectTupleSchema extends TupleSchema {
 
     @Override
     public void destroyTupleArray(FastTuple[] ary) {
-        long address = unsafe.getLong(ary[0], addressOffset);
-        unsafe.freeMemory(address);
+        long address = Coterie.getLong(ary[0], addressOffset);
+        Coterie.freeMemory(address);
     }
 
     @Override
     public <T> void destroyTypedTupleArray(T[] ary) {
-        long address = unsafe.getLong(ary[0], addressOffset);
-        unsafe.freeMemory(address);
+        long address = Coterie.getLong(ary[0], addressOffset);
+        Coterie.freeMemory(address);
     }
 
     public void destroy(FastTuple tuple) {
         if (clazz.isInstance(tuple)) {
-            long address = unsafe.getLong(tuple, addressOffset);
+            long address = Coterie.getLong(tuple, addressOffset);
             destroy(address);
         }
     }
 
     public void destroy(long address) {
-        unsafe.freeMemory(address);
+        Coterie.freeMemory(address);
     }
 
     @Override
     protected void generateClass() throws Exception {
         if (this.clazz == null) {
             this.clazz = new DirectTupleCodeGenerator(iface, fieldNames, fieldTypes, layout).cookToClass();
-            this.addressOffset = unsafe.objectFieldOffset(clazz.getField("address"));
+            this.addressOffset = Coterie.objectFieldOffset(clazz.getField("address"));
             TupleAllocatorGenerator generator = new TupleAllocatorGenerator(clazz);
             this.allocator = generator.createAllocator();
         }

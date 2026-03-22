@@ -2,7 +2,6 @@ package com.nickrobison.tuple.codegen;
 
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.janino.Java;
-import sun.misc.Unsafe;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,20 +28,7 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
                         null,
                         new Java.AccessModifier[]{new Java.AccessModifier(PUBLIC, loc)},
                         new Java.PrimitiveType(loc, Java.Primitive.LONG),
-                        new Java.VariableDeclarator[]{new Java.VariableDeclarator(loc, "address", 0, null)}),
-                new Java.FieldDeclaration(loc,
-                        null,
-                        new Java.AccessModifier[]{new Java.AccessModifier("static", loc), new Java.AccessModifier("private", loc)},
-                        classToType(loc, Unsafe.class),
-                        new Java.VariableDeclarator[]{
-                                new Java.VariableDeclarator(loc,
-                                        "unsafe",
-                                        0,
-                                        new Java.MethodInvocation(loc,
-                                                new Java.AmbiguousName(loc, new String[]{"Coterie"}),
-                                                "unsafe",
-                                                new Java.Rvalue[0]))
-                        })
+                        new Java.VariableDeclarator[]{new Java.VariableDeclarator(loc, "address", 0, null)})
         };
     }
 
@@ -124,7 +110,7 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
     @Override
     protected Java.Rvalue generateGetInvocation(Class<?> type, int index) {
         return new Java.MethodInvocation(loc,
-                new Java.AmbiguousName(loc, new String[]{"unsafe"}),
+                new Java.AmbiguousName(loc, new String[]{"Coterie"}),
                 "get" + accessorForType(type),
                 new Java.Rvalue[]{
                         new Java.BinaryOperation(loc,
@@ -138,7 +124,7 @@ public class DirectTupleCodeGenerator extends TupleCodeGenerator {
     @Override
     protected Java.Rvalue generateSetInvocation(Class<?> type, int index, String value) {
         return new Java.MethodInvocation(loc,
-                new Java.AmbiguousName(loc, new String[]{"unsafe"}),
+                new Java.AmbiguousName(loc, new String[]{"Coterie"}),
                 "put" + accessorForType(type),
                 new Java.Rvalue[]{
                         new Java.BinaryOperation(loc,
