@@ -32,13 +32,14 @@ allprojects {
 
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
+            languageVersion.set(JavaLanguageVersion.of(17))
         }
         withJavadocJar()
         withSourcesJar()
     }
 
     tasks.withType<JavaCompile>().configureEach {
+        options.release = 11
         options.errorprone.disableWarningsInGeneratedCode = true
     }
 
