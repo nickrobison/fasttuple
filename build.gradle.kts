@@ -7,7 +7,7 @@ plugins {
     id("info.solidsoft.pitest") version "1.19.0-rc.3" apply(false)
     id("org.jreleaser") version "1.23.0" apply(false)
     id("net.ltgt.errorprone") version "5.1.0"
-    id("com.gradleup.shadow") version "9.4.0" apply(false)
+    id("com.gradleup.shadow") version "9.4.1" apply(false)
 }
 
 val janinoVersion by extra("3.1.12")
