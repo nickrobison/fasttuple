@@ -3,7 +3,7 @@ import net.ltgt.gradle.errorprone.errorprone
 plugins {
     java
     jacoco
-    id("org.sonarqube") version "7.2.3.7755"
+    id("org.sonarqube") version "7.3.0.8198"
     id("info.solidsoft.pitest") version "1.19.0" apply(false)
     id("org.jreleaser") version "1.23.0" apply(false)
     id("net.ltgt.errorprone") version "5.1.0"
